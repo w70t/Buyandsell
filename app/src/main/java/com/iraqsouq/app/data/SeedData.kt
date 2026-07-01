@@ -1,0 +1,81 @@
+package com.iraqsouq.app.data
+
+/** Demo listings so the marketplace isn't empty on first launch. */
+object SeedData {
+    private fun img(seed: String) = "https://picsum.photos/seed/$seed/600/450"
+
+    val demoListings: List<Listing> = listOf(
+        Listing(
+            title = "تويوتا كورولا 2019 بحالة ممتازة",
+            description = "سيارة تويوتا كورولا موديل 2019، ماشية 60 ألف كم، فحص كامل، لون فضي، بدون حوادث.",
+            price = 18_500_000,
+            negotiable = true,
+            categoryId = "cars",
+            governorate = "بغداد",
+            images = listOf(img("corolla1"), img("corolla2")),
+            sellerId = -1,
+            sellerName = "أحمد العراقي",
+            sellerPhone = "07701234567",
+        ),
+        Listing(
+            title = "آيفون 14 برو ماكس 256 جيجا",
+            description = "آيفون 14 برو ماكس، لون بنفسجي، بطارية 92%، مع العلبة والشاحن الأصلي.",
+            price = 1_450_000,
+            negotiable = false,
+            categoryId = "phones",
+            governorate = "البصرة",
+            images = listOf(img("iphone14"), img("iphonebox")),
+            sellerId = -1,
+            sellerName = "مصطفى",
+            sellerPhone = "07807654321",
+        ),
+        Listing(
+            title = "شقة للإيجار 120 م في المنصور",
+            description = "شقة حديثة غرفتين نوم وصالة ومطبخ، طابق ثاني، قرب الخدمات، مفروشة جزئياً.",
+            price = 750_000,
+            negotiable = true,
+            categoryId = "realestate",
+            governorate = "بغداد",
+            images = listOf(img("apartment1"), img("apartment2")),
+            sellerId = -1,
+            sellerName = "مكتب النور العقاري",
+            sellerPhone = "07709998877",
+        ),
+        Listing(
+            title = "لابتوب Dell XPS 15 للبيع",
+            description = "معالج i7 جيل عاشر، رام 16، هارد SSD 512، شاشة 4K، مناسب للتصميم والألعاب.",
+            price = 950_000,
+            negotiable = true,
+            categoryId = "electronics",
+            governorate = "أربيل",
+            images = listOf(img("laptop1")),
+            sellerId = -1,
+            sellerName = "Karwan",
+            sellerPhone = "07501112233",
+        ),
+        Listing(
+            title = "طقم كنب 7 مقاعد مستعمل بحالة جيدة",
+            description = "طقم كنب مريح لون بيج، استعمال سنة واحدة فقط، السبب الانتقال للسفر.",
+            price = 400_000,
+            negotiable = true,
+            categoryId = "furniture",
+            governorate = "النجف",
+            images = listOf(img("sofa1"), img("sofa2")),
+            sellerId = -1,
+            sellerName = "زينب",
+            sellerPhone = "07803334455",
+        ),
+        Listing(
+            title = "بلايستيشن 5 مع يدتين و3 ألعاب",
+            description = "جهاز PS5 نسخة الديسك، مع يدتين و3 أقراص ألعاب، بحالة الزيرو.",
+            price = 620_000,
+            negotiable = false,
+            categoryId = "electronics",
+            governorate = "كربلاء",
+            images = listOf(img("ps5")),
+            sellerId = -1,
+            sellerName = "علي",
+            sellerPhone = "07705556677",
+        ),
+    )
+}

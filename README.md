@@ -1,77 +1,83 @@
-# سوق العراق — Iraq Souq 🛒
+# سوقنا — Souqna 🛒
 
-تطبيق أندرويد كامل للبيع والشراء في العراق، بأسلوب مشابه لتطبيق **Kleinanzeigen**.
-مبني بالكامل من الصفر باستخدام **Kotlin + Jetpack Compose + Room**، مع دعم كامل
-للغة العربية والاتجاه من اليمين إلى اليسار (RTL)، والمحافظات العراقية، وعملة الدينار العراقي.
+منصّة **بيع وشراء في العراق** (بأسلوب مشابه لتطبيقات الإعلانات المبوّبة مثل Kleinanzeigen،
+لكن بعلامة وتصميم مختلفين). كل شيء **حقيقي** — لا بيانات وهمية: تطبيق Flutter يتصل بـ
+Backend حقيقي (FastAPI + PostgreSQL) عبر REST، مع صور تُرفع وتُخزَّن فعلياً.
 
-A complete native Android marketplace app for Iraq, inspired by Kleinanzeigen —
-built from scratch with Kotlin, Jetpack Compose, and Room. Full Arabic/RTL UI,
-the 18 Iraqi governorates, and Iraqi Dinar pricing.
+مبني ليعمل **تجريبياً على Raspberry Pi ثم يُنقل إلى VPS/Domain بنفس حاويات Docker**
+دون إعادة بناء المشروع — فقط تتغيّر متغيّرات البيئة ورابط الـ API.
 
 ---
 
-## المميزات / Features
+## البنية (Monorepo)
 
-- 🔐 **الحسابات**: تسجيل حساب جديد وتسجيل الدخول (يُحفظ محلياً مع بقاء الجلسة).
-- 🏠 **الرئيسية**: الأقسام + أحدث الإعلانات.
-- 🔎 **البحث والفلترة**: بحث نصي + فلترة حسب القسم والمحافظة.
-- 🗂️ **الأقسام**: سيارات، هواتف، إلكترونيات، عقارات، أثاث، أزياء، وظائف، حيوانات، مستلزمات أطفال، وغيرها.
-- 📸 **إضافة إعلان**: عنوان، وصف، سعر، قابلية التفاوض، قسم، محافظة، وصور متعددة من الجهاز.
-- ❤️ **المفضلة**: حفظ الإعلانات المفضّلة.
-- 💬 **المحادثات**: مراسلة البائع داخل التطبيق (محادثات محلية) + زر اتصال مباشر.
-- 👤 **الملف الشخصي**: إعلاناتي، المفضلة، تسجيل الخروج.
-- 🌍 دعم كامل للعربية و RTL، و **18 محافظة عراقية**، وتسعير بالدينار العراقي.
+```
+.
+├── backend/            # FastAPI + SQLAlchemy(async) + Alembic + PostgreSQL
+│   ├── app/            #   auth, listings, categories, favorites, messages, admin
+│   ├── alembic/        #   المهاجرات (migrations)
+│   ├── scripts/        #   entrypoint + backup
+│   └── tests/          #   اختبارات
+├── mobile/             # تطبيق Flutter (RTL عربي، ثيم داكن)
+├── nginx/              # الوكيل العكسي (يخدم /media ويمرّر /api)
+├── docker-compose.yml  # api + db + nginx (+ minio اختياري)
+├── .env.example        # كل الإعدادات عبر متغيّرات البيئة
+└── docs/DEPLOYMENT.md  # دليل النشر: Raspberry Pi → VPS + Cloudflare + HTTPS + Backup
+```
 
-## البنية التقنية / Tech Stack
+## المكوّنات التقنية
 
 | الطبقة | التقنية |
 |-------|---------|
-| اللغة | Kotlin 2.0 |
-| واجهة المستخدم | Jetpack Compose (Material 3) |
-| التنقّل | Navigation Compose |
-| قاعدة البيانات | Room (SQLite) |
-| الجلسة/التفضيلات | DataStore |
-| تحميل الصور | Coil |
-| النمط المعماري | MVVM (ViewModel + StateFlow + Repository) |
+| التطبيق | Flutter (Material 3, RTL) + Dio + Provider + secure storage |
+| الـ API | FastAPI (Python 3.11) + Uvicorn |
+| قاعدة البيانات | PostgreSQL 16 عبر SQLAlchemy 2 (async) + مهاجرات Alembic |
+| التخزين | ملفات محلية (افتراضي) أو **MinIO/S3** بتبديل متغيّر واحد |
+| الحاويات | Docker + docker-compose، وNginx كوكيل عكسي |
 
-## هيكل المشروع / Project structure
+## المميزات
 
-```
-app/src/main/java/com/iraqsouq/app/
-├── MarketApp.kt            # Application + حاوية الاعتماديات
-├── MainActivity.kt         # نقطة الدخول + فرض RTL + الثيم
-├── model/StaticData.kt     # الأقسام + المحافظات العراقية
-├── data/                   # Room: Entities, DAOs, Database, Repository, Session, Seed
-└── ui/
-    ├── MainViewModel.kt    # حالة التطبيق (auth, listings, favorites, chat)
-    ├── theme/              # ألوان وثيم Material 3
-    ├── components/         # ListingCard, TopBar
-    ├── nav/                # Routes + AppRoot (Scaffold + BottomNav + NavHost)
-    └── screens/            # Auth, Home, Search, Category, Detail, PostAd,
-                            #   MyAds, Favorites, Chats, Chat, Profile
-```
+- 🔐 حسابات: تسجيل/دخول، جلسة دائمة، تحديث توكن تلقائي.
+- 🗂️ أقسام (تُدار من لوحة الإدارة) + 18 محافظة عراقية + تسعير بالدينار.
+- 📋 إعلانات: إنشاء/تعديل/حذف، صور متعددة، حالة (نشط/مباع/مخفي)، عدّاد مشاهدات.
+- 🔎 بحث وفلترة: نص + قسم + محافظة + سعر + ترتيب.
+- ❤️ مفضلة، 💬 محادثات بين البائع والمشتري، 👤 ملف شخصي وإعلاناتي.
+- 🛡️ لوحة إدارة (`/api/admin`): إحصاءات، إدارة المستخدمين (حظر/أدوار)، حذف إعلانات، إدارة الأقسام.
 
-## البناء والتشغيل / Build & Run
+## الأمان
 
-يتطلّب **Android Studio** (أحدث إصدار) أو حزمة Android SDK مع JDK 17.
+Argon2id لكلمات المرور · JWT (Access/Refresh مع تدوير) · Rate Limiting (slowapi) ·
+تحقّق مدخلات (Pydantic) · رفع صور آمن (إعادة ترميز عبر Pillow) · أدوار وصلاحيات ·
+نسخ احتياطي (pg_dump + الصور) · سجلّات · تشغيل بحاوية بمستخدم غير جذر.
 
-1. افتح المجلد في Android Studio (`File → Open`).
-2. اترك Gradle يزامن الاعتماديات.
-3. شغّل التطبيق على محاكي أو جهاز حقيقي (Android 7.0 / API 24 فأحدث).
+---
 
-من سطر الأوامر (يتطلّب ضبط `ANDROID_HOME` ووجود ملف `local.properties`):
+## التشغيل السريع (خادم)
 
 ```bash
-./gradlew assembleDebug        # إنشاء APK للتجربة
-./gradlew installDebug         # التثبيت على جهاز متصل
+cp .env.example .env      # عدّل SECRET_KEY وكلمات المرور و PUBLIC_BASE_URL
+docker compose up -d --build
+# الـ API:    http://localhost:8080/api
+# التوثيق:    http://localhost:8080/api/docs
+```
+يقوم الإقلاع تلقائياً بـ: انتظار قاعدة البيانات ← تطبيق المهاجرات ← بذر الأقسام وحساب المدير ← تشغيل الـ API.
+
+## تشغيل التطبيق
+
+```bash
+cd mobile
+flutter create .          # مرّة واحدة لتوليد مجلدات المنصّات (لا يمسّ lib/)
+flutter pub get
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080   # محاكي أندرويد
 ```
 
-> ملاحظة: عند أول تشغيل تُضاف إعلانات تجريبية تلقائياً لتظهر الواجهة عامرة.
-> لنشر إعلان أو المراسلة، أنشئ حساباً من شاشة "حسابي".
+## الاختبارات (Backend)
 
-## خارطة طريق مقترحة / Suggested next steps
+```bash
+cd backend
+pip install -r requirements-dev.txt
+pytest
+```
 
-- ربط بخادم حقيقي (REST/Firebase) بدل التخزين المحلي.
-- إشعارات فورية للرسائل.
-- تحديد الموقع على الخريطة داخل الإعلان.
-- التحقق من رقم الهاتف عبر OTP.
+## من الراسبيري إلى VPS
+راجع **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — يشمل Cloudflare Tunnel وHTTPS وترحيل البيانات والنسخ الاحتياطي.

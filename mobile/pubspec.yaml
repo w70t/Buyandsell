@@ -17,7 +17,7 @@ dependencies:
   flutter_secure_storage: ^9.2.2
   cached_network_image: ^3.4.1
   image_picker: ^1.1.2
-  intl: ^0.19.0
+  intl: ">=0.19.0 <0.21.0" # flutter_localizations يثبّت النسخة حسب إصدار Flutter
 
 dev_dependencies:
   flutter_test:
@@ -26,3 +26,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: Tajawal
+      fonts:
+        - asset: assets/fonts/Tajawal-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Tajawal-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Tajawal-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Tajawal-ExtraBold.ttf
+          weight: 800

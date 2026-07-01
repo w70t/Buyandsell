@@ -1,21 +1,79 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme.dart';
+
+/// حالة فارغة أنيقة: أيقونة داخل دائرة ناعمة + عنوان + وصف + زر اختياري.
 class EmptyState extends StatelessWidget {
-  const EmptyState({super.key, required this.message, this.icon = Icons.inbox_outlined});
+  const EmptyState({
+    super.key,
+    required this.message,
+    this.subtitle,
+    this.icon = Icons.inbox_outlined,
+    this.actionLabel,
+    this.onAction,
+  });
 
   final String message;
+  final String? subtitle;
   final IconData icon;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
+    final sx = context.sx;
     return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 56, color: Colors.grey),
-          const SizedBox(height: 12),
-          Text(message, style: const TextStyle(color: Colors.grey, fontSize: 16)),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: sx.accentSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 44, color: sx.accent),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: sx.textPrimary,
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: 6),
+              Text(
+                subtitle!,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: sx.textSecondary, height: 1.5),
+              ),
+            ],
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 20),
+              FilledButton.icon(
+                onPressed: onAction,
+                style: FilledButton.styleFrom(
+                  backgroundColor: sx.accent,
+                  foregroundColor: sx.onAccent,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                icon: const Icon(Icons.refresh_rounded, size: 20),
+                label: Text(actionLabel!),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -26,10 +84,10 @@ class LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      const Center(child: CircularProgressIndicator());
+      const Center(child: CircularProgressIndicator(strokeWidth: 3));
 }
 
-/// Prompt shown on tabs that require authentication.
+/// دعوة لتسجيل الدخول تُعرض في الأقسام المحمية.
 class LoginRequired extends StatelessWidget {
   const LoginRequired({super.key, required this.message, required this.onLogin});
 
@@ -38,22 +96,190 @@ class LoginRequired extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sx = context.sx;
     return Center(
-      child: Column(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 36),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: sx.accentSoft,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.lock_outline_rounded, size: 44, color: sx.accent),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w700,
+                color: sx.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'أنشئ حساباً خلال ثوانٍ وابدأ البيع والشراء',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: sx.textSecondary),
+            ),
+            const SizedBox(height: 22),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: onLogin,
+                icon: const Icon(Icons.login_rounded, size: 20),
+                label: const Text('تسجيل الدخول / إنشاء حساب'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// عنوان قسم مع زر «عرض الكل» اختياري.
+class SectionHeader extends StatelessWidget {
+  const SectionHeader({
+    super.key,
+    required this.title,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final String title;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
+      child: Row(
+        children: [
+          Container(
+            width: 4,
+            height: 18,
+            decoration: BoxDecoration(
+              color: sx.accent,
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              title,
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: sx.textPrimary,
+              ),
+            ),
+          ),
+          if (actionLabel != null)
+            GestureDetector(
+              onTap: onAction,
+              child: Text(
+                actionLabel!,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: sx.accent,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// شارة صغيرة ملوّنة (حالة، تفاوض…).
+class SxBadge extends StatelessWidget {
+  const SxBadge({
+    super.key,
+    required this.label,
+    required this.color,
+    this.icon,
+    this.onColor,
+  });
+
+  final String label;
+  final Color color;
+  final Color? onColor;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final fg = onColor ?? Colors.white;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.lock_outline, size: 56, color: Colors.grey),
-          const SizedBox(height: 12),
-          Text(message, style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 48),
-            child: ElevatedButton(
-              onPressed: onLogin,
-              child: const Text('تسجيل الدخول / إنشاء حساب'),
+          if (icon != null) ...[
+            Icon(icon, size: 12, color: fg),
+            const SizedBox(width: 3),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: fg,
+              height: 1.3,
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// حرف أول من الاسم داخل دائرة بلون مشتق من الاسم — رمز مستخدم.
+class InitialsAvatar extends StatelessWidget {
+  const InitialsAvatar({super.key, required this.name, this.radius = 22});
+
+  final String name;
+  final double radius;
+
+  static const _palette = [
+    Color(0xFF0D9488),
+    Color(0xFF6366F1),
+    Color(0xFFD97706),
+    Color(0xFFDB2777),
+    Color(0xFF7C3AED),
+    Color(0xFF0284C7),
+    Color(0xFF16A34A),
+    Color(0xFFDC2626),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final trimmed = name.trim();
+    final letter = trimmed.isEmpty ? '؟' : trimmed.substring(0, 1);
+    final color = _palette[trimmed.hashCode.abs() % _palette.length];
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: color.withOpacity(0.18),
+      child: Text(
+        letter,
+        style: TextStyle(
+          fontSize: radius * 0.85,
+          fontWeight: FontWeight.w800,
+          color: color,
+        ),
       ),
     );
   }

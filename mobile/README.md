@@ -36,18 +36,28 @@ flutter run --dart-define=API_BASE_URL=http://192.168.1.50:8080
 flutter build apk --release --dart-define=API_BASE_URL=https://souqna.example.com
 ```
 
+## نظام التصميم
+
+- خط **Tajawal** العربي مضمّن محلياً (`assets/fonts/`، رخصة OFL) بأربعة أوزان.
+- ثيمان كاملان **داكن وفاتح** يتبدّلان من شاشة «حسابي» ويُحفظ الاختيار.
+- كل الألوان عبر امتداد ثيم `SxColors` — الوصول من أي شاشة بـ `context.sx`.
+- هياكل تحميل (Shimmer skeletons) بلا أي حزم إضافية، حالات فارغة برسائل وأزرار،
+  شارات حالة (جديد/مُباع/نشط)، وتمرير لا نهائي في الرئيسية والبحث والأقسام.
+- شاشة انطلاق متحركة بهوية العلامة، وفواصل أيام وفقاعات بأوقات في المحادثة.
+
 ## البنية
 
 ```
 lib/
 ├── main.dart               # التهيئة وحقن مزوّدي الحالة
-├── core/                   # الإعداد، الثيم، عميل API (تحديث التوكن)، التخزين الآمن
+├── core/                   # الإعداد، الثيم (SxColors)، عميل API، التخزين الآمن، التنسيقات
 ├── models/                 # نماذج البيانات (JSON)
 ├── services/api_service.dart  # كل نداءات الـ API
-├── state/                  # AuthProvider + FavoritesProvider
-├── data/governorates.dart  # المحافظات العراقية
+├── state/                  # Auth + Favorites + Settings (الثيم)
+├── data/governorates.dart  # المحافظات العراقية الـ 18
 └── ui/
-    ├── app.dart            # MaterialApp + RTL عربي + الثيم الداكن
+    ├── app.dart            # MaterialApp + RTL عربي + شاشة الانطلاق + الثيمان
     ├── navigation.dart     # مساعدات التنقل
+    ├── widgets/            # بطاقة الإعلان، الشبكة الموحّدة، الهياكل، الحالات الفارغة
     └── screens/            # كل الشاشات (رئيسية، بحث، تفاصيل، نشر، مفضلة، محادثات، حساب…)
 ```

@@ -6,6 +6,7 @@ import 'core/token_store.dart';
 import 'services/api_service.dart';
 import 'state/auth_provider.dart';
 import 'state/favorites_provider.dart';
+import 'state/settings_provider.dart';
 import 'ui/app.dart';
 
 void main() {
@@ -17,6 +18,7 @@ void main() {
 
   final auth = AuthProvider(api, tokens);
   final favorites = FavoritesProvider(api);
+  final settings = SettingsProvider();
 
   // When the refresh token is rejected, drop the session app-wide.
   client.onSessionExpired = () {
@@ -30,6 +32,7 @@ void main() {
         Provider<ApiService>.value(value: api),
         ChangeNotifierProvider<AuthProvider>.value(value: auth),
         ChangeNotifierProvider<FavoritesProvider>.value(value: favorites),
+        ChangeNotifierProvider<SettingsProvider>.value(value: settings),
       ],
       child: const SouqnaApp(),
     ),

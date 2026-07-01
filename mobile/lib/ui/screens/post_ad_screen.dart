@@ -23,6 +23,8 @@ class PostAdScreen extends StatefulWidget {
 }
 
 class _PostAdScreenState extends State<PostAdScreen> {
+  static const _maxImages = 10;
+
   final _title = TextEditingController();
   final _description = TextEditingController();
   final _price = TextEditingController();
@@ -36,6 +38,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
 
   List<Category> _categories = [];
   bool _busy = false;
+  String _busyLabel = '';
 
   @override
   void initState() {
@@ -67,19 +70,29 @@ class _PostAdScreenState extends State<PostAdScreen> {
   Future<void> _pickImages() async {
     final picked = await ImagePicker().pickMultiImage(imageQuality: 85);
     if (picked.isNotEmpty) {
-      setState(() => _images.addAll(picked.take(10 - _images.length)));
+      setState(() => _images.addAll(picked.take(_maxImages - _images.length)));
     }
   }
 
+  String? _validate() {
+    if (_title.text.trim().length < 3) return 'اكتب عنواناً واضحاً (٣ أحرف على الأقل)';
+    if (_description.text.trim().length < 5) return 'اكتب وصفاً أطول قليلاً';
+    if (_categoryId == null) return 'اختر قسم الإعلان';
+    if (_price.text.trim().isEmpty) return 'حدّد السعر';
+    return null;
+  }
+
   Future<void> _publish() async {
-    final price = int.tryParse(_price.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
-    if (_title.text.trim().length < 3 || _description.text.trim().length < 5 || _categoryId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى تعبئة العنوان والوصف واختيار القسم')),
-      );
+    final error = _validate();
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
       return;
     }
-    setState(() => _busy = true);
+    final price = int.tryParse(_price.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+    setState(() {
+      _busy = true;
+      _busyLabel = 'جارٍ النشر…';
+    });
     final api = context.read<ApiService>();
     try {
       final listing = await api.createListing(
@@ -92,19 +105,23 @@ class _PostAdScreenState extends State<PostAdScreen> {
         governorate: _governorate,
         city: _city.text.trim(),
       );
-      for (final img in _images) {
-        await api.uploadImage(listing.id, img.path);
+      for (var i = 0; i < _images.length; i++) {
+        if (mounted) {
+          setState(() => _busyLabel = 'رفع الصور ${i + 1}/${_images.length}…');
+        }
+        await api.uploadImage(listing.id, _images[i].path);
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم نشر الإعلان بنجاح')),
+        const SnackBar(content: Text('تم نشر الإعلان بنجاح 🎉')),
       );
       _resetForm();
       widget.onPublished();
       openListing(context, listing.id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -128,109 +145,161 @@ class _PostAdScreenState extends State<PostAdScreen> {
     final loggedIn = context.watch<AuthProvider>().isLoggedIn;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('أضف إعلان')),
+      appBar: AppBar(title: const Text('أضف إعلانك')),
       body: !loggedIn
-          ? LoginRequired(message: 'سجّل الدخول لنشر إعلان', onLogin: () => openAuth(context))
+          ? LoginRequired(
+              message: 'سجّل الدخول لنشر إعلان',
+              onLogin: () => openAuth(context),
+            )
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _imagesRow(),
-                const SizedBox(height: 16),
-                TextField(controller: _title, decoration: const InputDecoration(labelText: 'العنوان')),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _description,
-                  maxLines: 4,
-                  decoration: const InputDecoration(labelText: 'الوصف', alignLabelWithHint: true),
+                _SectionCard(
+                  title: 'الصور',
+                  subtitle: 'حتى $_maxImages صور — الصورة الأولى هي الغلاف',
+                  icon: Icons.photo_camera_outlined,
+                  child: _imagesRow(),
                 ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: _price,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'السعر (د.ع)'),
-                ),
-                const SizedBox(height: 8),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  value: _negotiable,
-                  onChanged: (v) => setState(() => _negotiable = v),
-                  title: const Text('قابل للتفاوض'),
-                ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: RadioListTile<String>(
-                        contentPadding: EdgeInsets.zero,
-                        value: 'used',
-                        groupValue: _condition,
-                        onChanged: (v) => setState(() => _condition = v!),
-                        title: const Text('مستعمل'),
+                const SizedBox(height: 14),
+                _SectionCard(
+                  title: 'معلومات الإعلان',
+                  icon: Icons.description_outlined,
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _title,
+                        maxLength: 80,
+                        decoration: const InputDecoration(
+                          labelText: 'العنوان',
+                          hintText: 'مثال: آيفون 13 برو بحالة ممتازة',
+                          counterText: '',
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      child: RadioListTile<String>(
-                        contentPadding: EdgeInsets.zero,
-                        value: 'new',
-                        groupValue: _condition,
-                        onChanged: (v) => setState(() => _condition = v!),
-                        title: const Text('جديد'),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _description,
+                        maxLines: 5,
+                        maxLength: 2000,
+                        decoration: const InputDecoration(
+                          labelText: 'الوصف',
+                          hintText: 'اذكر التفاصيل: الحالة، مدة الاستخدام، سبب البيع…',
+                          alignLabelWithHint: true,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      DropdownButtonFormField<int>(
+                        value: _categoryId,
+                        decoration: const InputDecoration(labelText: 'القسم'),
+                        items: _categories
+                            .map((c) => DropdownMenuItem(
+                                value: c.id, child: Text(c.nameAr)))
+                            .toList(),
+                        onChanged: (v) => setState(() => _categoryId = v),
+                      ),
+                      const SizedBox(height: 14),
+                      _ConditionSelector(
+                        value: _condition,
+                        onChanged: (v) => setState(() => _condition = v),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<int>(
-                  value: _categoryId,
-                  decoration: const InputDecoration(labelText: 'القسم'),
-                  items: _categories
-                      .map((c) => DropdownMenuItem(value: c.id, child: Text(c.nameAr)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _categoryId = v),
+                const SizedBox(height: 14),
+                _SectionCard(
+                  title: 'السعر',
+                  icon: Icons.payments_outlined,
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _price,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'السعر',
+                          suffixText: 'د.ع',
+                        ),
+                      ),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: _negotiable,
+                        onChanged: (v) => setState(() => _negotiable = v),
+                        title: const Text('قابل للتفاوض'),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                DropdownButtonFormField<String>(
-                  value: _governorate,
-                  decoration: const InputDecoration(labelText: 'المحافظة'),
-                  items: iraqGovernorates
-                      .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                      .toList(),
-                  onChanged: (v) => setState(() => _governorate = v!),
+                const SizedBox(height: 14),
+                _SectionCard(
+                  title: 'الموقع',
+                  icon: Icons.location_on_outlined,
+                  child: Column(
+                    children: [
+                      DropdownButtonFormField<String>(
+                        value: _governorate,
+                        decoration: const InputDecoration(labelText: 'المحافظة'),
+                        items: iraqGovernorates
+                            .map((g) => DropdownMenuItem(value: g, child: Text(g)))
+                            .toList(),
+                        onChanged: (v) => setState(() => _governorate = v!),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _city,
+                        decoration: const InputDecoration(
+                          labelText: 'المنطقة (اختياري)',
+                          hintText: 'مثال: المنصور',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 12),
-                TextField(controller: _city, decoration: const InputDecoration(labelText: 'المنطقة (اختياري)')),
                 const SizedBox(height: 20),
-                ElevatedButton(
+                ElevatedButton.icon(
                   onPressed: _busy ? null : _publish,
-                  child: _busy
-                      ? const SizedBox(height: 22, width: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                      : const Text('نشر الإعلان'),
+                  icon: _busy
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.rocket_launch_outlined, size: 20),
+                  label: Text(_busy ? _busyLabel : 'نشر الإعلان'),
                 ),
+                const SizedBox(height: 24),
               ],
             ),
     );
   }
 
   Widget _imagesRow() {
+    final sx = context.sx;
     return SizedBox(
       height: 96,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
           GestureDetector(
-            onTap: _images.length >= 10 ? null : _pickImages,
+            onTap: _images.length >= _maxImages ? null : _pickImages,
             child: Container(
               width: 90,
               height: 90,
               decoration: BoxDecoration(
-                color: AppTheme.tile,
-                borderRadius: BorderRadius.circular(12),
+                color: sx.accentSoft,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: sx.accent.withOpacity(0.4)),
               ),
-              child: const Column(
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.add_a_photo_outlined, color: AppTheme.accent),
-                  SizedBox(height: 4),
-                  Text('إضافة', style: TextStyle(fontSize: 11, color: AppTheme.accent)),
+                  Icon(Icons.add_a_photo_outlined, color: sx.accent),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_images.length}/$_maxImages',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: sx.accent,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -241,12 +310,23 @@ class _PostAdScreenState extends State<PostAdScreen> {
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(File(_images[i].path), width: 90, height: 90, fit: BoxFit.cover),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.file(
+                      File(_images[i].path),
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.cover,
+                    ),
                   ),
+                  if (i == 0)
+                    Positioned(
+                      bottom: 4,
+                      right: 4,
+                      child: SxBadge(label: 'الغلاف', color: sx.accent),
+                    ),
                   Positioned(
-                    top: 2,
-                    right: 2,
+                    top: 3,
+                    left: 3,
                     child: GestureDetector(
                       onTap: () => setState(() => _images.removeAt(i)),
                       child: const CircleAvatar(
@@ -261,6 +341,131 @@ class _PostAdScreenState extends State<PostAdScreen> {
             ),
         ],
       ),
+    );
+  }
+}
+
+/// بطاقة قسم في نموذج النشر.
+class _SectionCard extends StatelessWidget {
+  const _SectionCard({
+    required this.title,
+    required this.icon,
+    required this.child,
+    this.subtitle,
+  });
+
+  final String title;
+  final String? subtitle;
+  final IconData icon;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: sx.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: sx.outline),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: sx.accentSoft,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, size: 18, color: sx.accent),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: sx.textPrimary,
+                      ),
+                    ),
+                    if (subtitle != null)
+                      Text(
+                        subtitle!,
+                        style: TextStyle(
+                          fontSize: 11.5,
+                          color: sx.textSecondary,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// مبدّل جديد/مستعمل على شكل شريحتين.
+class _ConditionSelector extends StatelessWidget {
+  const _ConditionSelector({required this.value, required this.onChanged});
+
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    Widget option(String v, String label, IconData icon) {
+      final selected = value == v;
+      return Expanded(
+        child: GestureDetector(
+          onTap: () => onChanged(v),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+              color: selected ? sx.accent : sx.surfaceHigh,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: selected ? sx.accent : sx.outline),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon,
+                    size: 17, color: selected ? sx.onAccent : sx.textSecondary),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: selected ? sx.onAccent : sx.textPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Row(
+      children: [
+        option('used', 'مستعمل', Icons.autorenew_rounded),
+        const SizedBox(width: 10),
+        option('new', 'جديد', Icons.fiber_new_outlined),
+      ],
     );
   }
 }

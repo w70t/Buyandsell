@@ -17,20 +17,20 @@ Future<void> openAuth(BuildContext context) async {
   }
 }
 
-void openListing(BuildContext context, int id) {
-  Navigator.of(context).push(
+Future<void> openListing(BuildContext context, int id) {
+  return Navigator.of(context).push(
     MaterialPageRoute(builder: (_) => ListingDetailScreen(listingId: id)),
   );
 }
 
-void openChat(
+Future<void> openChat(
   BuildContext context, {
   required String conversationId,
   required int listingId,
   required int otherUserId,
   required String title,
 }) {
-  Navigator.of(context).push(
+  return Navigator.of(context).push(
     MaterialPageRoute(
       builder: (_) => ChatScreen(
         conversationId: conversationId,
@@ -59,5 +59,5 @@ bool requireLogin(BuildContext context) {
 }
 
 extension ListingNav on Listing {
-  void open(BuildContext context) => openListing(context, id);
+  Future<void> open(BuildContext context) => openListing(context, id);
 }

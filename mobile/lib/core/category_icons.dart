@@ -35,3 +35,37 @@ IconData categoryIcon(String key) {
       return Icons.widgets_outlined;
   }
 }
+
+/// لون مميّز لكل قسم — يجعل صف الأقسام حيوياً بدل لون واحد مكرر.
+Color categoryColor(String key) {
+  switch (key) {
+    case 'home':
+      return const Color(0xFF0EA5E9); // sky
+    case 'car':
+      return const Color(0xFFEF4444); // red
+    case 'phone':
+      return const Color(0xFF8B5CF6); // violet
+    case 'bolt':
+      return const Color(0xFFF59E0B); // amber
+    case 'chair':
+      return const Color(0xFFD97706); // wood
+    case 'shirt':
+      return const Color(0xFFDB2777); // pink
+    case 'work':
+      return const Color(0xFF64748B); // slate
+    case 'stroller':
+      return const Color(0xFF06B6D4); // cyan
+    case 'pets':
+      return const Color(0xFF16A34A); // green
+    case 'tools':
+      return const Color(0xFF78716C); // stone
+    case 'sports':
+      return const Color(0xFF22C55E); // green
+    case 'book':
+      return const Color(0xFF6366F1); // indigo
+    case 'gift':
+      return const Color(0xFFE11D48); // rose
+    default:
+      return const Color(0xFF14B8A6); // brand teal
+  }
+}

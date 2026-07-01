@@ -66,10 +66,13 @@ docker compose up -d --build
 
 ```bash
 cd mobile
-flutter create .          # مرّة واحدة لتوليد مجلدات المنصّات (لا يمسّ lib/)
+flutter create . --platforms=android --org iq.souqna   # مرّة واحدة لتوليد مجلد أندرويد
 flutter pub get
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:8080   # محاكي أندرويد
 ```
+
+**آيفون (iOS):** مجلد `ios/` مضمّن وجاهز (الاسم بالعربي، أذونات الصور، Podfile).
+يتطلب macOS + Xcode — راجع قسم iOS في [mobile/README.md](mobile/README.md).
 
 ## الاختبارات (Backend)
 

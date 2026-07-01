@@ -5,11 +5,12 @@
 
 ## أول تشغيل
 
-هذه الحزمة تحتوي كود `lib/` كاملاً. لتوليد مجلدات المنصّات (android/ios) شغّل مرّة واحدة:
+هذه الحزمة تحتوي كود `lib/` كاملاً، ومجلد **iOS جاهز ومضبوط** داخل المستودع.
+لتوليد مجلد أندرويد شغّل مرّة واحدة:
 
 ```bash
 cd mobile
-flutter create .          # يولّد android/ و ios/ دون المساس بـ lib/
+flutter create . --platforms=android --org iq.souqna   # يولّد android/ دون المساس بـ lib/ أو ios/
 flutter pub get
 ```
 
@@ -20,6 +21,36 @@ flutter pub get
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 واضبط في `android/app/build.gradle`:  `minSdkVersion 21` (مطلوب لـ flutter_secure_storage).
+
+## تطبيق الآيفون (iOS) 🍎
+
+مجلد `ios/` مضمّن في المستودع ومضبوط مسبقاً:
+
+- اسم التطبيق على الشاشة: **سوقنا**، ومعرّف الحزمة: `iq.souqna.app`.
+- أذونات مكتبة الصور والكاميرا (لرفع صور الإعلانات) بنصوص عربية.
+- استثناء ATS يسمح بالاتصال بخادم HTTP محلي أثناء التجربة
+  (احذف مفتاح `NSAppTransportSecurity` من `ios/Runner/Info.plist` عند النشر بدومين HTTPS).
+- `Podfile` جاهز بحد أدنى iOS 13.
+
+البناء يتطلب جهاز macOS مع Xcode (شرط من Apple لكل تطبيقات iOS):
+
+```bash
+cd mobile
+flutter pub get
+cd ios && pod install && cd ..
+
+# تشغيل على محاكي/جهاز آيفون
+flutter run --dart-define=API_BASE_URL=http://192.168.1.50:8080
+
+# ملاحظة: محاكي iOS يصل لجهازك المحلي عبر localhost مباشرة
+flutter run --dart-define=API_BASE_URL=http://localhost:8080
+
+# إصدار للنشر (يتطلب حساب Apple Developer للتوقيع)
+flutter build ipa --release --dart-define=API_BASE_URL=https://souqna.example.com
+```
+
+لتوقيع التطبيق وتشغيله على جهاز حقيقي: افتح `ios/Runner.xcworkspace` في Xcode
+واختر فريقك في Signing & Capabilities مرة واحدة.
 
 ## التشغيل مع رابط الخادم
 

@@ -15,8 +15,8 @@ void main() {
     expect(theme.brightness, Brightness.light);
   });
 
-  test('both themes use the Tajawal font', () {
-    expect(AppTheme.dark().textTheme.bodyMedium?.fontFamily, 'Tajawal');
-    expect(AppTheme.light().textTheme.bodyMedium?.fontFamily, 'Tajawal');
+  test('both themes use the Cairo font', () {
+    expect(AppTheme.dark().textTheme.bodyMedium?.fontFamily, 'Cairo');
+    expect(AppTheme.light().textTheme.bodyMedium?.fontFamily, 'Cairo');
   });
 }

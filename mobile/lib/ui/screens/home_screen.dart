@@ -178,6 +178,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 )
               else ...[
+                const SliverToBoxAdapter(
+                  child: SectionHeader(title: 'تصفح الأقسام'),
+                ),
                 SliverToBoxAdapter(child: _categoriesRow()),
                 const SliverToBoxAdapter(
                   child: SectionHeader(title: 'أحدث الإعلانات'),
@@ -226,11 +229,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 58,
                     height: 58,
                     decoration: BoxDecoration(
-                      color: color.withOpacity(0.14),
+                      gradient: categoryGradient(c.icon),
                       borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: color.withOpacity(0.25)),
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withOpacity(0.35),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: Icon(categoryIcon(c.icon), color: color, size: 27),
+                    child: Icon(categoryIcon(c.icon),
+                        color: Colors.white, size: 27),
                   ),
                   const SizedBox(height: 6),
                   Text(

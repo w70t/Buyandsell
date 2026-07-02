@@ -85,7 +85,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
   Future<void> _publish() async {
     final error = _validate();
     if (error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      showAppSnack(context, error, type: SnackType.error);
       return;
     }
     final price = int.tryParse(_price.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
@@ -112,16 +112,13 @@ class _PostAdScreenState extends State<PostAdScreen> {
         await api.uploadImage(listing.id, _images[i].path);
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم نشر الإعلان بنجاح 🎉')),
-      );
+      showAppSnack(context, 'تم نشر الإعلان بنجاح', type: SnackType.success);
       _resetForm();
       widget.onPublished();
       openListing(context, listing.id);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(apiErrorMessage(e))));
+        showAppSnack(context, apiErrorMessage(e), type: SnackType.error);
       }
     } finally {
       if (mounted) setState(() => _busy = false);

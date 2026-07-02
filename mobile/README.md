@@ -69,7 +69,7 @@ flutter build apk --release --dart-define=API_BASE_URL=https://souqna.example.co
 
 ## نظام التصميم
 
-- خط **Tajawal** العربي مضمّن محلياً (`assets/fonts/`، رخصة OFL) بأربعة أوزان.
+- خط **Cairo** العربي مضمّن محلياً (`assets/fonts/`، رخصة OFL) بخمسة أوزان.
 - ثيمان كاملان **داكن وفاتح** يتبدّلان من شاشة «حسابي» ويُحفظ الاختيار.
 - كل الألوان عبر امتداد ثيم `SxColors` — الوصول من أي شاشة بـ `context.sx`.
 - هياكل تحميل (Shimmer skeletons) بلا أي حزم إضافية، حالات فارغة برسائل وأزرار،

@@ -100,9 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _scrollToBottom();
     } catch (_) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تعذّر إرسال الرسالة')),
-        );
+        showAppSnack(context, 'تعذّر إرسال الرسالة', type: SnackType.error);
       }
     } finally {
       if (mounted) setState(() => _sending = false);

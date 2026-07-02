@@ -85,11 +85,18 @@ class _CategoryScreenState extends State<CategoryScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.14),
+                gradient: categoryGradient(widget.category.icon),
                 borderRadius: BorderRadius.circular(10),
+                boxShadow: [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
               ),
               child: Icon(categoryIcon(widget.category.icon),
-                  color: color, size: 20),
+                  color: Colors.white, size: 20),
             ),
             const SizedBox(width: 10),
             Text(widget.category.nameAr),

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ 'تعديل الإعلان' if listing else 'أضف إعلاناً' }} — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="form-card">
+  <h1>{{ 'تعديل الإعلان' if listing else 'أضف إعلاناً جديداً' }}</h1>
+  {% if error %}<div class="flash err" data-test="form-error">{{ error }}</div>{% endif %}
+  <form action="{{ '/listings/' ~ listing.id ~ '/edit' if listing else '/post' }}" method="post"
+        enctype="multipart/form-data" data-test="listing-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>العنوان<input type="text" name="title" required minlength="3" maxlength="140" value="{{ listing.title if listing }}"></label>
+    <label>الوصف<textarea name="description" required minlength="5" maxlength="5000" rows="5">{{ listing.description if listing }}</textarea></label>
+    <div class="row">
+      <label>السعر (د.ع)<input type="number" name="price" required min="0" value="{{ listing.price if listing else '' }}"></label>
+      <label class="check"><input type="checkbox" name="negotiable" value="true" {{ 'checked' if listing and listing.negotiable }}> قابل للتفاوض</label>
+    </div>
+    <div class="row">
+      <label>القسم
+        <select name="category_id" required>
+          {% for c in nav_categories %}
+          <option value="{{ c.id }}" {{ 'selected' if listing and listing.category_id == c.id }}>{{ c.name_ar }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>الحالة
+        <select name="condition">
+          <option value="used" {{ 'selected' if listing and listing.condition == 'used' }}>مستعمل</option>
+          <option value="new" {{ 'selected' if listing and listing.condition == 'new' }}>جديد</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label>المحافظة
+        <select name="governorate" required>
+          {% for g in governorates %}
+          <option value="{{ g }}" {{ 'selected' if listing and listing.governorate == g }}>{{ g }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>المدينة / المنطقة<input type="text" name="city" maxlength="80" value="{{ listing.city if listing }}"></label>
+    </div>
+    <label>الصور (حتى 10)<input type="file" name="images" accept="image/*" multiple></label>
+    {% if listing and listing.images %}
+    <div class="thumbs">
+      {% for img in listing.images %}<img src="{{ img.url }}" alt="">{% endfor %}
+    </div>
+    {% endif %}
+    <button class="btn btn-accent wide" type="submit" data-test="listing-submit">{{ 'حفظ التعديلات' if listing else 'نشر الإعلان' }}</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}لوحة الإدارة — {{ app_name }}{% endblock %}
+{% block admin_content %}
+<h1>لوحة التحكم</h1>
+<div class="stats-grid" data-test="admin-stats">
+  <div class="stat"><span class="num" data-test="stat-users">{{ stats.users }}</span>مستخدم</div>
+  <div class="stat"><span class="num" data-test="stat-listings">{{ stats.listings }}</span>إعلان</div>
+  <div class="stat"><span class="num">{{ stats.active_listings }}</span>إعلان نشط</div>
+  <div class="stat"><span class="num">{{ stats.messages }}</span>رسالة</div>
+  <div class="stat {{ 'alert' if stats.open_reports }}"><span class="num" data-test="stat-reports">{{ stats.open_reports }}</span>بلاغ مفتوح</div>
+  <div class="stat"><span class="num">{{ stats.banned_users }}</span>محظور</div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}البلاغات — الإدارة{% endblock %}
+{% block admin_content %}
+<h1>البلاغات ({{ total }})</h1>
+<div class="filters">
+  <a class="btn {{ 'btn-accent' if status_filter == 'open' }}" href="/admin/reports?status=open">مفتوح</a>
+  <a class="btn {{ 'btn-accent' if status_filter == 'resolved' }}" href="/admin/reports?status=resolved">معالج</a>
+  <a class="btn {{ 'btn-accent' if status_filter == 'dismissed' }}" href="/admin/reports?status=dismissed">مرفوض</a>
+</div>
+<div class="report-cards" data-test="reports-list">
+  {% for r in reports %}
+  <div class="report-card" data-test="report-row">
+    <div class="report-head">
+      <strong>#{{ r.id }} — {{ reason_labels.get(r.reason, r.reason) }}</strong>
+      <span class="meta">{{ r.created_at|timeago }} · من {{ r.reporter.name if r.reporter else '؟' }}</span>
+    </div>
+    <div class="report-target">
+      {% if r.listing %}الإعلان: <a href="/listings/{{ r.listing.id }}">{{ r.listing.title }}</a> ({{ r.listing.status }}){% endif %}
+      {% if r.reported_user %} · المستخدم: {{ r.reported_user.name }}{% if r.reported_user.is_banned %} 🚫{% endif %}{% endif %}
+    </div>
+    {% if r.details %}<p class="report-details">{{ r.details }}</p>{% endif %}
+    {% if r.status == 'open' %}
+    <div class="report-actions">
+      <form class="inline" action="/admin/reports/{{ r.id }}/resolve" method="post" data-test="resolve-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <select name="action">
+          <option value="none">بدون إجراء</option>
+          {% if r.listing_id %}<option value="hide_listing">إخفاء الإعلان</option>
+          <option value="delete_listing">حذف الإعلان</option>{% endif %}
+          {% if r.reported_user_id %}<option value="ban_user">حظر المستخدم</option>{% endif %}
+        </select>
+        <input type="text" name="note" placeholder="ملاحظة (اختياري)" maxlength="400">
+        <button class="btn btn-accent" data-test="resolve-submit">معالجة</button>
+      </form>
+      <form class="inline" action="/admin/reports/{{ r.id }}/dismiss" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn" data-test="dismiss-submit">رفض البلاغ</button>
+      </form>
+    </div>
+    {% else %}
+    <div class="meta">الحالة: {{ r.status }} · الإجراء: {{ r.action or '—' }}</div>
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="empty" data-test="no-reports">لا توجد بلاغات.</p>
+  {% endfor %}
+</div>
+{{ pagination(page, pages, '/admin/reports?status=' ~ status_filter) }}
+{% endblock %}

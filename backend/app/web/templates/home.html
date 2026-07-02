@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_card %}
+{% block content %}
+<section class="categories">
+  <h2>الأقسام</h2>
+  <div class="cat-grid">
+    {% for c in nav_categories %}
+    <a class="cat" href="/search?category_id={{ c.id }}" data-test="category-tile">
+      <span class="cat-icon">{{ category_icons.get(c.icon, '📦') }}</span>
+      <span class="cat-name">{{ c.name_ar }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+<section>
+  <h2>أحدث الإعلانات</h2>
+  <div class="grid" data-test="latest-grid">
+    {% for l in listings %}{{ listing_card(l, fav_ids, csrf_token, user) }}{% else %}
+    <p class="empty">لا توجد إعلانات بعد — كن أول من ينشر!</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

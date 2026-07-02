@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ app_name }} — سوق البيع والشراء في العراق{% endblock %}</title>
+<meta name="description" content="{% block meta_description %}سوقنا — منصّة بيع وشراء في العراق: إعلانات، بحث، محادثات ومفضلة.{% endblock %}">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="container topbar-inner">
+    <a class="brand" href="/">🛒 {{ app_name }}</a>
+    <form class="nav-search" action="/search" method="get">
+      <input type="search" name="q" placeholder="ابحث عن أي شيء…" value="{{ q or '' }}">
+      <button type="submit">بحث</button>
+    </form>
+    <nav class="nav-links">
+      {% if user %}
+        <a href="/post" class="btn btn-accent" data-test="nav-post">+ أضف إعلاناً</a>
+        <a href="/notifications" data-test="nav-notifications">🔔{% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
+        <a href="/chat" data-test="nav-chat">💬</a>
+        <a href="/favorites" data-test="nav-favorites">❤</a>
+        <a href="/my" data-test="nav-my">إعلاناتي</a>
+        {% if user.role == 'admin' %}<a href="/admin" data-test="nav-admin">الإدارة</a>{% endif %}
+        <form action="/logout" method="post" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="linklike" type="submit" data-test="nav-logout">خروج</button>
+        </form>
+      {% else %}
+        <a href="/login" data-test="nav-login">دخول</a>
+        <a href="/register" class="btn btn-accent" data-test="nav-register">حساب جديد</a>
+      {% endif %}
+    </nav>
+  </div>
+</header>
+<main class="container">
+{% block content %}{% endblock %}
+</main>
+<footer class="footer">
+  <div class="container">{{ app_name }} — بيع وشراء في العراق · <a href="/search">تصفّح الإعلانات</a></div>
+</footer>
+</body>
+</html>

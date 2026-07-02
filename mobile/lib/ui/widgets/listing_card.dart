@@ -166,9 +166,7 @@ class ListingCard extends StatelessWidget {
   void _toggleFav(BuildContext context) {
     final auth = context.read<AuthProvider>();
     if (!auth.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('سجّل الدخول لإضافة المفضلة')),
-      );
+      showAppSnack(context, 'سجّل الدخول لإضافة المفضلة');
       return;
     }
     context.read<FavoritesProvider>().toggle(listing.id);

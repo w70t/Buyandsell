@@ -68,9 +68,7 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
     final l = _listing!;
     final me = context.read<AuthProvider>().user!;
     if (me.id == l.seller.id) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('هذا إعلانك أنت 😊')),
-      );
+      showAppSnack(context, 'هذا إعلانك أنت');
       return;
     }
     openChat(

@@ -59,15 +59,11 @@ class _MyAdsScreenState extends State<MyAdsScreen> {
         await context.read<ApiService>().deleteListing(l.id);
         setState(() => _items.removeWhere((e) => e.id == l.id));
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تم حذف الإعلان')),
-          );
+          showAppSnack(context, 'تم حذف الإعلان', type: SnackType.success);
         }
       } catch (_) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('تعذّر حذف الإعلان')),
-          );
+          showAppSnack(context, 'تعذّر حذف الإعلان', type: SnackType.error);
         }
       }
     }

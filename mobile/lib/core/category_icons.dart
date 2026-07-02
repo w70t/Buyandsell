@@ -1,38 +1,41 @@
 import 'package:flutter/material.dart';
 
 /// Maps the backend category `icon` key to a Material icon.
+///
+/// أيقونات ممتلئة (rounded/filled) — تعطي حضوراً أقوى وأقرب للتطبيقات
+/// التجارية الحديثة من الأيقونات المفرّغة.
 IconData categoryIcon(String key) {
   switch (key) {
     case 'grid':
       return Icons.grid_view_rounded;
     case 'home':
-      return Icons.home_work_outlined;
+      return Icons.apartment_rounded;
     case 'car':
-      return Icons.directions_car_filled_outlined;
+      return Icons.directions_car_filled_rounded;
     case 'phone':
-      return Icons.smartphone_outlined;
+      return Icons.smartphone_rounded;
     case 'bolt':
-      return Icons.bolt_outlined;
+      return Icons.electrical_services_rounded;
     case 'chair':
-      return Icons.chair_outlined;
+      return Icons.chair_rounded;
     case 'shirt':
-      return Icons.checkroom_outlined;
+      return Icons.checkroom_rounded;
     case 'work':
-      return Icons.work_outline;
+      return Icons.business_center_rounded;
     case 'stroller':
-      return Icons.child_friendly_outlined;
+      return Icons.child_friendly_rounded;
     case 'pets':
-      return Icons.pets_outlined;
+      return Icons.pets_rounded;
     case 'tools':
-      return Icons.handyman_outlined;
+      return Icons.handyman_rounded;
     case 'sports':
-      return Icons.sports_soccer_outlined;
+      return Icons.sports_soccer_rounded;
     case 'book':
-      return Icons.menu_book_outlined;
+      return Icons.auto_stories_rounded;
     case 'gift':
-      return Icons.card_giftcard_outlined;
+      return Icons.redeem_rounded;
     default:
-      return Icons.widgets_outlined;
+      return Icons.widgets_rounded;
   }
 }
 
@@ -68,4 +71,21 @@ Color categoryColor(String key) {
     default:
       return const Color(0xFF14B8A6); // brand teal
   }
+}
+
+/// تدرّج لوني للقسم: من نسخة أفتح إلى أغمق من لون القسم —
+/// يعطي عمقاً واقعياً لبلاطات الأقسام بدل اللون المسطح.
+LinearGradient categoryGradient(String key) {
+  final base = categoryColor(key);
+  final hsl = HSLColor.fromColor(base);
+  final light = hsl
+      .withLightness((hsl.lightness + 0.10).clamp(0.0, 1.0))
+      .withSaturation((hsl.saturation + 0.05).clamp(0.0, 1.0))
+      .toColor();
+  final deep = hsl.withLightness((hsl.lightness - 0.12).clamp(0.0, 1.0)).toColor();
+  return LinearGradient(
+    begin: Alignment.topRight,
+    end: Alignment.bottomLeft,
+    colors: [light, base, deep],
+  );
 }

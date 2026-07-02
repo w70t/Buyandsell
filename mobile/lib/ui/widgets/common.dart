@@ -2,6 +2,75 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 
+/// نوع الإشعار — يحدد الأيقونة واللون.
+enum SnackType { success, error, info }
+
+/// إشعار موحّد عصري: أيقونة داخل كبسولة ملوّنة + نص، بدل الإيموجي.
+void showAppSnack(
+  BuildContext context,
+  String message, {
+  SnackType type = SnackType.info,
+}) {
+  final sx = context.sx;
+  final (IconData icon, Color color) = switch (type) {
+    SnackType.success => (Icons.check_circle_rounded, sx.success),
+    SnackType.error => (Icons.error_rounded, sx.danger),
+    SnackType.info => (Icons.info_rounded, AppTheme.brand),
+  };
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        elevation: 0,
+        duration: const Duration(seconds: 3),
+        backgroundColor: Colors.transparent,
+        padding: EdgeInsets.zero,
+        content: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1F2937),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: color.withOpacity(0.35)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.25),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.18),
+                  borderRadius: BorderRadius.circular(11),
+                ),
+                child: Icon(icon, color: color, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    fontFamily: AppTheme.fontFamily,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+}
+
 /// حالة فارغة أنيقة: أيقونة داخل دائرة ناعمة + عنوان + وصف + زر اختياري.
 class EmptyState extends StatelessWidget {
   const EmptyState({

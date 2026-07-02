@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 /// نظام تصميم «سوقنا» — Souqna Design System.
 ///
-/// ثيمان (داكن/فاتح) مبنيان على نفس الرموز اللونية، مع خط Tajawal العربي،
+/// ثيمان (داكن/فاتح) مبنيان على نفس الرموز اللونية، مع خط Cairo العربي،
 /// وامتداد ثيم [SxColors] تقرأ منه الواجهات كل الألوان بدل الثوابت المبعثرة.
 class AppTheme {
   AppTheme._();
@@ -23,7 +23,7 @@ class AppTheme {
     colors: [Color(0xFF0D9488), Color(0xFF14B8A6), Color(0xFF2DD4BF)],
   );
 
-  static const String fontFamily = 'Tajawal';
+  static const String fontFamily = 'Cairo';
 
   // ================= الثيم الداكن =================
   static ThemeData dark() {

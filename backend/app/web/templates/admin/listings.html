@@ -1,0 +1,37 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}الإعلانات — الإدارة{% endblock %}
+{% block admin_content %}
+<h1>الإعلانات ({{ total }})</h1>
+<div class="filters">
+  <a class="btn {{ 'btn-accent' if not status_filter }}" href="/admin/listings">الكل</a>
+  <a class="btn {{ 'btn-accent' if status_filter == 'active' }}" href="/admin/listings?status=active">نشط</a>
+  <a class="btn {{ 'btn-accent' if status_filter == 'sold' }}" href="/admin/listings?status=sold">مباع</a>
+  <a class="btn {{ 'btn-accent' if status_filter == 'hidden' }}" href="/admin/listings?status=hidden">مخفي</a>
+</div>
+<table class="table" data-test="admin-listings-table">
+  <tr><th>#</th><th>العنوان</th><th>البائع</th><th>السعر</th><th>الحالة</th><th>إجراءات</th></tr>
+  {% for l in listings %}
+  <tr data-test="admin-listing-row">
+    <td>{{ l.id }}</td>
+    <td><a href="/listings/{{ l.id }}">{{ l.title }}</a></td>
+    <td>{{ l.seller.name }}</td>
+    <td>{{ l.price|price }}</td>
+    <td>{{ l.status }}</td>
+    <td class="actions">
+      <form class="inline" action="/admin/listings/{{ l.id }}/status" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="status" value="{{ 'active' if l.status == 'hidden' else 'hidden' }}">
+        <button class="btn" data-test="admin-hide-toggle">{{ 'إظهار' if l.status == 'hidden' else 'إخفاء' }}</button>
+      </form>
+      <form class="inline" action="/admin/listings/{{ l.id }}/delete" method="post"
+            onsubmit="return confirm('حذف الإعلان نهائياً؟')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn btn-danger" data-test="admin-delete-listing">حذف</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{{ pagination(page, pages, '/admin/listings?status=' ~ status_filter) }}
+{% endblock %}

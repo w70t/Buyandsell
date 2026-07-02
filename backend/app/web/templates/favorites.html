@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_card %}
+{% block title %}المفضلة — {{ app_name }}{% endblock %}
+{% block content %}
+<h1>المفضلة</h1>
+<div class="grid" data-test="fav-grid">
+  {% for l in listings %}{{ listing_card(l, fav_ids, csrf_token, user) }}{% else %}
+  <p class="empty" data-test="fav-empty">لا توجد إعلانات في المفضلة.</p>
+  {% endfor %}
+</div>
+{% endblock %}

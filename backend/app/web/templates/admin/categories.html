@@ -1,0 +1,29 @@
+{% extends "admin/base_admin.html" %}
+{% block title %}الأقسام — الإدارة{% endblock %}
+{% block admin_content %}
+<h1>الأقسام</h1>
+<form class="filters" action="/admin/categories" method="post" data-test="category-form">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+  <input type="text" name="slug" placeholder="slug (لاتيني)" required pattern="[a-z0-9_-]+">
+  <input type="text" name="name_ar" placeholder="الاسم بالعربية" required>
+  <input type="text" name="subtitle_ar" placeholder="وصف قصير">
+  <input type="text" name="icon" placeholder="icon" value="widgets">
+  <input type="number" name="sort_order" value="99" style="width:80px">
+  <button class="btn btn-accent" data-test="category-create">إضافة قسم</button>
+</form>
+<table class="table" data-test="categories-table">
+  <tr><th>#</th><th>slug</th><th>الاسم</th><th>الترتيب</th><th>فعّال</th><th></th></tr>
+  {% for c in categories %}
+  <tr>
+    <td>{{ c.id }}</td><td>{{ c.slug }}</td><td>{{ category_icons.get(c.icon,'📦') }} {{ c.name_ar }}</td>
+    <td>{{ c.sort_order }}</td><td>{{ '✅' if c.is_active else '⛔' }}</td>
+    <td>
+      <form class="inline" action="/admin/categories/{{ c.id }}/toggle" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="btn" data-test="category-toggle">{{ 'تعطيل' if c.is_active else 'تفعيل' }}</button>
+      </form>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

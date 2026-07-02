@@ -1,8 +1,9 @@
 from pathlib import Path
+from urllib.parse import quote
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
@@ -11,6 +12,9 @@ from app.api.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging, logger
 from app.core.rate_limit import limiter
+from app.web import routes_admin, routes_public
+from app.web.deps import LoginRequired
+from app.web.helpers import STATIC_DIR
 
 configure_logging()
 
@@ -46,6 +50,16 @@ if settings.storage_backend.lower() == "local":
     app.mount("/media", StaticFiles(directory=settings.upload_dir), name="media")
 
 app.include_router(api_router, prefix="/api")
+
+# Server-rendered web app (public site + admin dashboard) + its static assets.
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.include_router(routes_admin.router)
+app.include_router(routes_public.router)
+
+
+@app.exception_handler(LoginRequired)
+async def login_required_handler(request: Request, exc: LoginRequired) -> RedirectResponse:
+    return RedirectResponse(f"/login?next={quote(exc.next_path)}", status_code=303)
 
 
 @app.on_event("startup")

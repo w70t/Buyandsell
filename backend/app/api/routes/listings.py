@@ -7,6 +7,7 @@ from app.core.deps import CurrentUser, DbDep, OptionalUser
 from app.models import Category, Listing, ListingImage, ListingStatus
 from app.schemas.common import Page
 from app.schemas.listing import ListingCreate, ListingOut, ListingUpdate
+from app.services.notify import telegram_admin_bg
 from app.services.storage import UploadError, storage
 
 router = APIRouter(prefix="/listings", tags=["listings"])
@@ -124,6 +125,7 @@ async def create_listing(payload: ListingCreate, user: CurrentUser, db: DbDep) -
     listing = await db.scalar(
         select(Listing).where(Listing.id == listing.id).options(*_EAGER)
     )
+    telegram_admin_bg(f"📋 إعلان جديد #{listing.id}: {listing.title} ({listing.price} IQD) — Souqna")
     return listing_to_out(listing)
 
 

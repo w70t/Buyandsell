@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ listing.title }} — {{ app_name }}{% endblock %}
+{% block meta_description %}{{ listing.description[:150] }}{% endblock %}
+{% block content %}
+<article class="detail" data-test="listing-detail">
+  {% if request.query_params.get('reported') %}<div class="flash ok" data-test="report-ok">تم استلام بلاغك، شكراً لك.</div>{% endif %}
+  {% if listing.status == 'hidden' %}<div class="flash warn">هذا الإعلان مخفي — لا يظهر للزوار.</div>{% endif %}
+  {% if listing.status == 'sold' %}<div class="flash ok">تم البيع ✔</div>{% endif %}
+  <div class="detail-grid">
+    <div class="gallery">
+      {% if listing.images %}
+        <img id="main-img" src="{{ listing.images[0].url }}" alt="{{ listing.title }}">
+        {% if listing.images|length > 1 %}
+        <div class="thumbs">
+          {% for img in listing.images %}
+          <img src="{{ img.url }}" alt="" onclick="document.getElementById('main-img').src=this.src">
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% else %}<div class="noimg big">{{ category_icons.get(listing.category.icon, '📦') }}</div>{% endif %}
+    </div>
+    <div class="detail-info">
+      <h1 data-test="listing-title">{{ listing.title }}</h1>
+      <div class="price big" data-test="listing-price">{{ listing.price|price }}{% if listing.negotiable %} <small>قابل للتفاوض</small>{% endif %}</div>
+      <div class="meta">
+        {{ listing.category.name_ar }} · {{ listing.governorate }}{% if listing.city %} · {{ listing.city }}{% endif %}<br>
+        {{ 'جديد' if listing.condition == 'new' else 'مستعمل' }} · {{ listing.created_at|timeago }} · 👁 {{ listing.views }}
+      </div>
+      <p class="description" data-test="listing-description">{{ listing.description }}</p>
+
+      <div class="seller-box">
+        <div>البائع: <a href="/users/{{ listing.seller.id }}" data-test="seller-link">{{ listing.seller.name }}</a></div>
+      </div>
+
+      {% if user and not is_owner %}
+        <form class="message-box" action="/listings/{{ listing.id }}/message" method="post" data-test="message-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <textarea name="body" required minlength="1" maxlength="2000" placeholder="اكتب رسالة للبائع…"></textarea>
+          <button class="btn btn-accent" type="submit" data-test="send-message">إرسال رسالة</button>
+        </form>
+        <form class="inline" action="/favorites/{{ listing.id }}/toggle" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn" data-test="fav-toggle-detail">{{ '❤ إزالة من المفضلة' if listing.id in fav_ids else '🤍 أضف للمفضلة' }}</button>
+        </form>
+        <details class="report-box">
+          <summary data-test="report-open">🚩 إبلاغ عن الإعلان</summary>
+          <form action="/report" method="post" data-test="report-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            <select name="reason" required>
+              {% for value, label in report_reasons %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+            <textarea name="details" maxlength="2000" placeholder="تفاصيل إضافية (اختياري)"></textarea>
+            <button class="btn" type="submit" data-test="report-submit">إرسال البلاغ</button>
+          </form>
+        </details>
+      {% elif not user %}
+        <p><a href="/login?next=/listings/{{ listing.id }}" class="btn">سجّل الدخول للتواصل مع البائع</a></p>
+      {% endif %}
+
+      {% if is_owner %}
+      <div class="owner-controls" data-test="owner-controls">
+        <a class="btn" href="/listings/{{ listing.id }}/edit" data-test="edit-listing">تعديل</a>
+        <form class="inline" action="/listings/{{ listing.id }}/status" method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <select name="status">
+            <option value="active" {{ 'selected' if listing.status == 'active' }}>نشط</option>
+            <option value="sold" {{ 'selected' if listing.status == 'sold' }}>مباع</option>
+            <option value="hidden" {{ 'selected' if listing.status == 'hidden' }}>مخفي</option>
+          </select>
+          <button class="btn" type="submit" data-test="status-save">تغيير الحالة</button>
+        </form>
+        <form class="inline" action="/listings/{{ listing.id }}/delete" method="post"
+              onsubmit="return confirm('حذف الإعلان نهائياً؟')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="btn btn-danger" type="submit" data-test="delete-listing">حذف</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</article>
+{% endblock %}

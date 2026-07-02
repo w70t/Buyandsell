@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}محادثة — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="chat-page">
+  <h1>{{ other.name if other else 'محادثة' }}{% if listing %} — <a href="/listings/{{ listing.id }}">{{ listing.title }}</a>{% endif %}</h1>
+  <div class="chat-box" id="chat-box" data-test="chat-box">
+    {% for m in messages %}
+    <div class="msg {{ 'mine' if m.sender_id == user.id else 'theirs' }}" data-test="chat-message">
+      <div class="msg-body">{{ m.body }}</div>
+      <div class="msg-meta">{{ m.created_at|timeago }}{% if m.sender_id == user.id %} {{ '✓✓' if m.is_read else '✓' }}{% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+  <form class="chat-send" action="/chat/{{ conversation_id }}/send" method="post" data-test="chat-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="text" name="body" required maxlength="2000" placeholder="اكتب رسالتك…" autocomplete="off">
+    <button class="btn btn-accent" type="submit" data-test="chat-send">إرسال</button>
+  </form>
+</div>
+<script>
+  const box = document.getElementById('chat-box');
+  box.scrollTop = box.scrollHeight;
+  setInterval(() => location.reload(), 15000); // simple polling refresh
+</script>
+{% endblock %}

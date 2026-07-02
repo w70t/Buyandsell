@@ -1,0 +1,34 @@
+{% macro listing_card(l, fav_ids, csrf_token, user) %}
+<article class="card" data-test="listing-card">
+  <a class="card-link" href="/listings/{{ l.id }}">
+    <div class="card-img">
+      {% if l.images %}<img src="{{ l.images[0].url }}" alt="{{ l.title }}" loading="lazy">
+      {% else %}<div class="noimg">{{ category_icons.get(l.category.icon, '📦') }}</div>{% endif %}
+      {% if l.status == 'sold' %}<span class="ribbon">مباع</span>{% endif %}
+      {% if l.status == 'hidden' %}<span class="ribbon gray">مخفي</span>{% endif %}
+    </div>
+    <div class="card-body">
+      <h3>{{ l.title }}</h3>
+      <div class="price">{{ l.price|price }}{% if l.negotiable %} <small>قابل للتفاوض</small>{% endif %}</div>
+      <div class="meta">{{ l.governorate }}{% if l.city %} · {{ l.city }}{% endif %} · {{ l.created_at|timeago }}</div>
+    </div>
+  </a>
+  {% if user %}
+  <form class="fav-form" action="/favorites/{{ l.id }}/toggle" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button title="مفضلة" data-test="fav-toggle" class="{{ 'active' if l.id in fav_ids }}">{{ '❤' if l.id in fav_ids else '🤍' }}</button>
+  </form>
+  {% endif %}
+</article>
+{% endmacro %}
+
+{% macro pagination(page, pages, base_url) %}
+{% if pages > 1 %}
+<nav class="pagination">
+  {% for p in range(1, pages + 1) %}
+    {% if p == page %}<span class="current">{{ p }}</span>
+    {% else %}<a href="{{ base_url }}{{ '&' if '?' in base_url else '?' }}page={{ p }}">{{ p }}</a>{% endif %}
+  {% endfor %}
+</nav>
+{% endif %}
+{% endmacro %}

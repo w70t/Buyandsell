@@ -1,0 +1,34 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}المستخدمون — الإدارة{% endblock %}
+{% block admin_content %}
+<h1>المستخدمون ({{ total }})</h1>
+<form class="filters" method="get"><input type="search" name="q" placeholder="بحث بالاسم أو الهاتف" value="{{ q }}"><button class="btn">بحث</button></form>
+<table class="table" data-test="users-table">
+  <tr><th>#</th><th>الاسم</th><th>الهاتف</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr>
+  {% for u in users %}
+  <tr data-test="user-row">
+    <td>{{ u.id }}</td>
+    <td>{{ u.name }}</td>
+    <td dir="ltr">{{ u.phone }}</td>
+    <td>{{ 'مدير' if u.role == 'admin' else 'مستخدم' }}</td>
+    <td>{{ '🚫 محظور' if u.is_banned else '✅' }}</td>
+    <td class="actions">
+      {% if u.id != user.id %}
+      <form class="inline" action="/admin/users/{{ u.id }}/ban" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="banned" value="{{ 'false' if u.is_banned else 'true' }}">
+        <button class="btn {{ '' if u.is_banned else 'btn-danger' }}" data-test="ban-toggle">{{ 'رفع الحظر' if u.is_banned else 'حظر' }}</button>
+      </form>
+      <form class="inline" action="/admin/users/{{ u.id }}/role" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="role" value="{{ 'user' if u.role == 'admin' else 'admin' }}">
+        <button class="btn" data-test="role-toggle">{{ 'إزالة الإدارة' if u.role == 'admin' else 'ترقية لمدير' }}</button>
+      </form>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+{{ pagination(page, pages, '/admin/users?q=' ~ q) }}
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_card, pagination %}
+{% block title %}بحث: {{ q }} — {{ app_name }}{% endblock %}
+{% block content %}
+<form class="filters" action="/search" method="get" data-test="filters-form">
+  <input type="search" name="q" placeholder="كلمة البحث" value="{{ q }}">
+  <select name="category_id">
+    <option value="">كل الأقسام</option>
+    {% for c in nav_categories %}
+    <option value="{{ c.id }}" {{ 'selected' if category_id == c.id }}>{{ c.name_ar }}</option>
+    {% endfor %}
+  </select>
+  <select name="governorate">
+    <option value="">كل المحافظات</option>
+    {% for g in governorates %}
+    <option value="{{ g }}" {{ 'selected' if governorate == g }}>{{ g }}</option>
+    {% endfor %}
+  </select>
+  <input type="number" name="min_price" placeholder="السعر من" min="0" value="{{ min_price if min_price is not none }}">
+  <input type="number" name="max_price" placeholder="السعر إلى" min="0" value="{{ max_price if max_price is not none }}">
+  <select name="sort">
+    <option value="recent" {{ 'selected' if sort == 'recent' }}>الأحدث</option>
+    <option value="price_asc" {{ 'selected' if sort == 'price_asc' }}>الأرخص</option>
+    <option value="price_desc" {{ 'selected' if sort == 'price_desc' }}>الأغلى</option>
+  </select>
+  <button type="submit" class="btn btn-accent">بحث</button>
+</form>
+<p class="results-count" data-test="results-count">{{ total }} نتيجة</p>
+<div class="grid" data-test="results-grid">
+  {% for l in listings %}{{ listing_card(l, fav_ids, csrf_token, user) }}{% else %}
+  <p class="empty" data-test="no-results">لا توجد نتائج مطابقة.</p>
+  {% endfor %}
+</div>
+{{ pagination(page, pages, request.url.path ~ '?' ~ (request.url.query | replace('page=' ~ page, '') ) ) }}
+{% endblock %}

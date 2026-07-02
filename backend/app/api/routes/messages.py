@@ -2,8 +2,9 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import func, select, update
 
 from app.core.deps import CurrentUser, DbDep
-from app.models import Listing, Message, User
+from app.models import Listing, Message, NotificationType, User
 from app.schemas.message import ConversationOut, MessageCreate, MessageOut
+from app.services.notify import notify_user
 
 router = APIRouter(prefix="/messages", tags=["messages"])
 
@@ -31,6 +32,14 @@ async def send_message(payload: MessageCreate, user: CurrentUser, db: DbDep) -> 
         body=payload.body.strip(),
     )
     db.add(msg)
+    notify_user(
+        db,
+        payload.receiver_id,
+        NotificationType.MESSAGE.value,
+        f"رسالة جديدة من {user.name}",
+        payload.body.strip()[:120],
+        f"/chat/{msg.conversation_id}",
+    )
     await db.commit()
     await db.refresh(msg)
     return msg

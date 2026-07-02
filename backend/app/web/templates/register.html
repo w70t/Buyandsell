@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}حساب جديد — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>حساب جديد</h1>
+  {% if error %}<div class="flash err" data-test="auth-error">{{ error }}</div>{% endif %}
+  <form action="/register" method="post" data-test="register-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>الاسم<input type="text" name="name" required minlength="2" value="{{ name }}"></label>
+    <label>رقم الهاتف<input type="tel" name="phone" required placeholder="07701234567" value="{{ phone }}"></label>
+    <label>كلمة المرور<input type="password" name="password" required minlength="6"></label>
+    <button class="btn btn-accent wide" type="submit" data-test="register-submit">إنشاء الحساب</button>
+  </form>
+  <p>لديك حساب؟ <a href="/login">سجّل الدخول</a></p>
+</div>
+{% endblock %}

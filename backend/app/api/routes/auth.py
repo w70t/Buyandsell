@@ -23,6 +23,7 @@ from app.schemas.auth import (
     TokenPair,
 )
 from app.schemas.user import UserMe
+from app.services.notify import telegram_admin_bg
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -50,6 +51,7 @@ async def register(request: Request, payload: RegisterRequest, db: DbDep) -> Aut
     db.add(user)
     await db.commit()
     await db.refresh(user)
+    telegram_admin_bg(f"👤 مستخدم جديد: {user.name} — Souqna")
     return AuthResponse(user=UserMe.model_validate(user), tokens=_tokens(user))
 
 

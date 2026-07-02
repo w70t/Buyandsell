@@ -3,6 +3,9 @@
 الفكرة الأساسية: **نفس حاويات Docker تعمل على الراسبيري ثم على الـ VPS**، ولا يتغيّر
 سوى ملف `.env` ورابط الـ API في التطبيق. لا إعادة بناء للمشروع.
 
+> أدلة مفصّلة خطوة بخطوة: **[RASPBERRY_PI_DEPLOYMENT.md](RASPBERRY_PI_DEPLOYMENT.md)**
+> للراسبيري و**[MIGRATION_TO_VPS.md](MIGRATION_TO_VPS.md)** للترحيل. هذا الملف نظرة عامة.
+
 ---
 
 ## 1) التشغيل على Raspberry Pi (تجريبي داخل البيت)
@@ -19,12 +22,16 @@ git clone <repo-url> souqna && cd souqna
 cp .env.example .env
 nano .env        # غيّر SECRET_KEY وكلمات المرور، واضبط PUBLIC_BASE_URL=http://<IP-الراسبيري>:8080
 
+# مجلد الصور (حاوية الـ API تعمل بمستخدم غير جذري uid 1000)
+mkdir -p data/uploads && sudo chown -R 1000:1000 data/uploads
+
 # الإقلاع
 docker compose up -d --build
 docker compose logs -f api      # للاطمئنان أن المهاجرات والبذور تمّت
 ```
 
-الآن الـ API على `http://<IP-الراسبيري>:8080/api` والتوثيق على `/api/docs`.
+الآن **الموقع الكامل** على `http://<IP-الراسبيري>:8080` (تصفّح/نشر/محادثة)، لوحة
+الإدارة على `/admin`، والـ API على `/api` والتوثيق على `/api/docs`.
 التطبيق (Flutter) يتصل هكذا:
 
 ```bash

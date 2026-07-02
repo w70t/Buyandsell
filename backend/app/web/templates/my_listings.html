@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% from "_macros.html" import listing_card %}
+{% block title %}إعلاناتي — {{ app_name }}{% endblock %}
+{% block content %}
+<h1>إعلاناتي</h1>
+<div class="grid" data-test="my-grid">
+  {% for l in listings %}{{ listing_card(l, fav_ids, csrf_token, user) }}{% else %}
+  <p class="empty">لم تنشر أي إعلان بعد. <a href="/post">أضف إعلانك الأول</a></p>
+  {% endfor %}
+</div>
+{% endblock %}

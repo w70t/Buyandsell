@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}المحادثات — {{ app_name }}{% endblock %}
+{% block content %}
+<h1>المحادثات</h1>
+<ul class="conv-list" data-test="conversations">
+  {% for c in conversations %}
+  <li>
+    <a href="/chat/{{ c.id }}" data-test="conversation-item">
+      <div class="conv-top"><strong>{{ c.other_name }}</strong>
+        {% if c.unread %}<span class="badge">{{ c.unread }}</span>{% endif %}
+        <span class="meta">{{ c.at|timeago }}</span>
+      </div>
+      <div class="conv-listing">{{ c.listing_title }}</div>
+      <div class="conv-last">{{ c.last[:80] }}</div>
+    </a>
+  </li>
+  {% else %}
+  <p class="empty" data-test="no-conversations">لا توجد محادثات بعد.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

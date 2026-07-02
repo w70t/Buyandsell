@@ -4,8 +4,9 @@ from sqlalchemy.orm import selectinload
 
 from app.api.serializers import listing_to_out
 from app.core.deps import CurrentUser, DbDep
-from app.models import Favorite, Listing
+from app.models import Favorite, Listing, NotificationType
 from app.schemas.listing import ListingOut
+from app.services.notify import notify_user
 
 router = APIRouter(prefix="/favorites", tags=["favorites"])
 
@@ -34,11 +35,21 @@ async def favorite_ids(user: CurrentUser, db: DbDep) -> list[int]:
 
 @router.post("/{listing_id}", status_code=status.HTTP_201_CREATED)
 async def add_favorite(listing_id: int, user: CurrentUser, db: DbDep) -> dict:
-    if await db.get(Listing, listing_id) is None:
+    listing = await db.get(Listing, listing_id)
+    if listing is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "الإعلان غير موجود")
     exists = await db.get(Favorite, {"user_id": user.id, "listing_id": listing_id})
     if exists is None:
         db.add(Favorite(user_id=user.id, listing_id=listing_id))
+        if listing.seller_id != user.id:
+            notify_user(
+                db,
+                listing.seller_id,
+                NotificationType.FAVORITE.value,
+                "أُضيف إعلانك إلى المفضلة",
+                f"أضاف {user.name} إعلانك «{listing.title}» إلى مفضلته.",
+                f"/listings/{listing.id}",
+            )
         await db.commit()
     return {"detail": "added"}
 

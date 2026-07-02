@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}الإشعارات — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>الإشعارات</h1>
+  <form action="/notifications/read-all" method="post" class="inline">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn" type="submit" data-test="read-all">تحديد الكل كمقروء</button>
+  </form>
+</div>
+<ul class="notif-list" data-test="notifications">
+  {% for n in notifications %}
+  <li class="{{ 'unread' if not n.is_read }}" data-test="notification-item">
+    {% if n.link %}<a href="{{ n.link }}">{% endif %}
+    <strong>{{ n.title }}</strong>
+    <div>{{ n.body }}</div>
+    <span class="meta">{{ n.created_at|timeago }}</span>
+    {% if n.link %}</a>{% endif %}
+  </li>
+  {% else %}
+  <p class="empty" data-test="no-notifications">لا توجد إشعارات.</p>
+  {% endfor %}
+</ul>
+{% endblock %}

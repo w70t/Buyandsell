@@ -39,3 +39,5 @@ mobile/pubspec.lock
 .vscode/
 *.iml
 .DS_Store
+data/
+backups/

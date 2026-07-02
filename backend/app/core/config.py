@@ -39,6 +39,19 @@ class Settings(BaseSettings):
     rate_limit_default: str = "100/minute"
     rate_limit_auth: str = "10/minute"
 
+    # Optional Redis (rate-limit storage shared across workers; unset = in-memory).
+    redis_url: str = ""
+
+    # Moderation: hide a listing automatically once it collects this many open reports.
+    reports_auto_hide_threshold: int = 5
+
+    # Telegram notifications for the admin (leave empty to disable).
+    telegram_bot_token: str = ""
+    telegram_admin_chat_id: str = ""
+
+    # Web (SSR) session cookies. Set true once you serve over HTTPS.
+    cookie_secure: bool = False
+
     # Seed admin
     admin_phone: str = "07700000000"
     admin_name: str = "Admin"

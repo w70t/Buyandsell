@@ -1,0 +1,22 @@
+{% extends "admin/base_admin.html" %}
+{% from "_macros.html" import pagination %}
+{% block title %}سجل التدقيق — الإدارة{% endblock %}
+{% block admin_content %}
+<h1>سجل التدقيق ({{ total }})</h1>
+<table class="table" data-test="audit-table">
+  <tr><th>#</th><th>المدير</th><th>الإجراء</th><th>الهدف</th><th>ملاحظة</th><th>الوقت</th></tr>
+  {% for e in entries %}
+  <tr data-test="audit-row">
+    <td>{{ e.id }}</td>
+    <td>{{ e.admin.name if e.admin else 'النظام' }}</td>
+    <td dir="ltr">{{ e.action }}</td>
+    <td dir="ltr">{{ e.target_type }}#{{ e.target_id or '—' }}</td>
+    <td>{{ e.note }}</td>
+    <td>{{ e.created_at|timeago }}</td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="empty">السجل فارغ.</td></tr>
+  {% endfor %}
+</table>
+{{ pagination(page, pages, '/admin/audit') }}
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-layout">
+  <aside class="admin-nav">
+    <a href="/admin" data-test="admin-nav-dashboard">📊 لوحة التحكم</a>
+    <a href="/admin/users" data-test="admin-nav-users">👥 المستخدمون</a>
+    <a href="/admin/listings" data-test="admin-nav-listings">📋 الإعلانات</a>
+    <a href="/admin/reports" data-test="admin-nav-reports">🚩 البلاغات</a>
+    <a href="/admin/categories" data-test="admin-nav-categories">🗂 الأقسام</a>
+    <a href="/admin/audit" data-test="admin-nav-audit">📜 سجل التدقيق</a>
+  </aside>
+  <section class="admin-content">
+  {% block admin_content %}{% endblock %}
+  </section>
+</div>
+{% endblock %}

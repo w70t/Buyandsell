@@ -82,6 +82,22 @@ pip install -r requirements-dev.txt
 pytest
 ```
 
+## لقطات من التطبيق
+
+لقطات حقيقية (خط Cairo + بيانات فعلية من الـ API):
+
+| الرئيسية (داكن) | الرئيسية (فاتح) | تفاصيل الإعلان |
+|---|---|---|
+| ![home dark](docs/screenshots/home-dark.png) | ![home light](docs/screenshots/home-light.png) | ![detail](docs/screenshots/listing-detail.png) |
+
+| البحث | المحادثة | نشر إعلان |
+|---|---|---|
+| ![search](docs/screenshots/search.png) | ![chat](docs/screenshots/chat.png) | ![post](docs/screenshots/post-ad.png) |
+
+| تسجيل الدخول | حسابي | المحادثات |
+|---|---|---|
+| ![auth](docs/screenshots/auth.png) | ![profile](docs/screenshots/profile.png) | ![conversations](docs/screenshots/conversations.png) |
+
 ## من الراسبيري إلى VPS
 راجع **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** — يشمل Cloudflare Tunnel وHTTPS وترحيل البيانات والنسخ الاحتياطي.
 

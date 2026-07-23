@@ -39,9 +39,10 @@ class _SxShimmerState extends State<SxShimmer>
           blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) {
             return LinearGradient(
-              // ميل قطري خفيف (يبدأ من اليمين علوياً) — أكثر حداثة من الأفقي.
-              begin: const Alignment(1.0, -0.35),
-              end: const Alignment(-1.0, 0.35),
+              // ميل قطري (يبدأ من اليمين علوياً) — كي يعبر الشعاع الشبكة
+              // كلها قطرياً: بطاقات الأعلى تلمع قبل الأسفل.
+              begin: const Alignment(1.0, -0.6),
+              end: const Alignment(-1.0, 0.6),
               // نطاق لمعان ناعم بخمس محطات: قاعدة → لمعان → قاعدة.
               colors: [
                 sx.shimmerBase,
@@ -138,6 +139,9 @@ class ListingCardSkeleton extends StatelessWidget {
 }
 
 /// شبكة هياكل تحميل تُستخدم كـ sliver.
+///
+/// الشبكة كلها ملفوفة بلمعان **واحد** كي يعبر الشعاع كامل الشبكة قطرياً
+/// (بدل لمعان مستقل لكل بطاقة).
 class SliverListingGridSkeleton extends StatelessWidget {
   const SliverListingGridSkeleton({super.key, this.count = 6});
 
@@ -145,18 +149,20 @@ class SliverListingGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.all(12),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 0.72,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, i) => const SxShimmer(child: ListingCardSkeleton()),
-          childCount: count,
+    return SliverToBoxAdapter(
+      child: SxShimmer(
+        child: GridView.builder(
+          padding: const EdgeInsets.all(12),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.72,
+          ),
+          itemCount: count,
+          itemBuilder: (_, __) => const ListingCardSkeleton(),
         ),
       ),
     );

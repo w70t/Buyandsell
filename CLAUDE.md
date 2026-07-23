@@ -2,7 +2,7 @@
 <One line: what it does, for whom.>
 
 ## Status  (AI must update this at end of every task)
-Working: Web UI + admin panel use a modern inline-SVG icon set (app/web/icons.py); all 34 backend tests pass. Flutter app gained modern micro-interactions: haptics (fav/tabs/categories/contact), press-scale (cards/categories/search), staggered grid entrance, and Hero image transition card→detail (new PressableScale/EntranceFade in widgets/common.dart). Bottom nav bar is now a frosted glass bar (BackdropFilter + extendBody in home_shell.dart); tab screens get glassNavInset() bottom padding so content clears the bar.
+Working: Web UI + admin panel use a modern inline-SVG icon set (app/web/icons.py); all 34 backend tests pass. Flutter app gained modern micro-interactions: haptics (fav/tabs/categories/contact), press-scale (cards/categories/search), staggered grid entrance, and Hero image transition card→detail (new PressableScale/EntranceFade in widgets/common.dart). Bottom nav bar and the listing-detail action bar are frosted glass bars (BackdropFilter + extendBody); tab screens get glassNavInset() bottom padding so content clears the bar.
 In progress: none
 Known bugs: none — note: Flutter toolchain not available in this env, so changes were verified by static bracket/API review, not `flutter analyze`.
 Last updated: 2026-07-23

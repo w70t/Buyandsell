@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -143,6 +145,8 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
     final isFav = context.watch<FavoritesProvider>().contains(l.id);
 
     return Scaffold(
+      // يمتدّ الجسم تحت شريط الإجراء ليظهر تأثير الزجاج (blur) خلفه.
+      extendBody: true,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -339,21 +343,30 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
               ),
             ),
           ],
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          // مساحة سفلية كي لا يختفي آخر المحتوى خلف شريط الإجراء الزجاجي.
+          SliverToBoxAdapter(
+            child: SizedBox(height: 88 + MediaQuery.of(context).viewPadding.bottom),
+          ),
         ],
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: sx.surface,
-          border: Border(top: BorderSide(color: sx.outline)),
-        ),
-        padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
-        child: SafeArea(
-          top: false,
-          child: ElevatedButton.icon(
-            onPressed: _contactSeller,
-            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
-            label: const Text('مراسلة البائع'),
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            decoration: BoxDecoration(
+              // شبه شفاف كي يظهر المحتوى المموّه خلف الشريط (زجاجي).
+              color: sx.surface.withOpacity(0.72),
+              border: Border(top: BorderSide(color: sx.outline.withOpacity(0.6))),
+            ),
+            padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+            child: SafeArea(
+              top: false,
+              child: ElevatedButton.icon(
+                onPressed: _contactSeller,
+                icon: const Icon(Icons.chat_bubble_outline_rounded, size: 20),
+                label: const Text('مراسلة البائع'),
+              ),
+            ),
           ),
         ),
       ),

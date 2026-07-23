@@ -1,6 +1,63 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+
+/// خلفية زجاجية لشريط التطبيق العلوي — تُمرَّر كـ `flexibleSpace` فيظهر
+/// المحتوى مموّهاً خلف الشريط عند التمرير (تأثير خفيف بلون شبه شفاف + حدّ سفلي).
+class GlassBar extends StatelessWidget {
+  const GlassBar({super.key, this.sigma = 16});
+
+  final double sigma;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+        child: Container(
+          decoration: BoxDecoration(
+            color: sx.surface.withOpacity(0.60),
+            border: Border(
+              bottom: BorderSide(color: sx.outline.withOpacity(0.5)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// ارتفاع الشريط السفلي الزجاجي (بدون المنطقة الآمنة السفلية).
+const double kBottomNavBarHeight = 64;
+
+/// حشوة سفلية تُضاف لمحتوى شاشات التبويبات كي لا يختفي آخره خلف الشريط
+/// الزجاجي — لأن الجسم يمتدّ تحت الشريط (extendBody) ليظهر تأثير الـ blur.
+double glassNavInset(BuildContext context) =>
+    kBottomNavBarHeight + MediaQuery.of(context).viewPadding.bottom;
+
+/// حشوة علوية لمحتوى شاشة ذات شريط علوي زجاجي (مع extendBodyBehindAppBar)
+/// كي لا يختبئ أول عنصر خلف الشريط: ارتفاع الشريط + شريط الحالة.
+double glassTopInset(BuildContext context) =>
+    kToolbarHeight + MediaQuery.of(context).viewPadding.top;
+
+/// شريط تطبيق علوي زجاجي موحّد (شفاف + تمويه المحتوى خلفه).
+/// استخدمه مع `Scaffold(extendBodyBehindAppBar: true, …)` وأضِف
+/// [glassTopInset] كحشوة علوية لمحتوى الشاشة.
+AppBar glassAppBar({
+  required Widget title,
+  List<Widget>? actions,
+}) {
+  return AppBar(
+    title: title,
+    actions: actions,
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    flexibleSpace: const GlassBar(),
+  );
+}
 
 /// نوع الإشعار — يحدد الأيقونة واللون.
 enum SnackType { success, error, info }

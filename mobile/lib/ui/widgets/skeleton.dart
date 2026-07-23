@@ -16,7 +16,7 @@ class _SxShimmerState extends State<SxShimmer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1400),
+    duration: const Duration(milliseconds: 1500),
   )..repeat();
 
   @override
@@ -32,20 +32,27 @@ class _SxShimmerState extends State<SxShimmer>
       animation: _ctrl,
       child: widget.child,
       builder: (context, child) {
-        final t = _ctrl.value;
+        // مدى الحركة مضبوط بحيث يدخل اللمعان من حافة ويخرج من الأخرى دون
+        // «وقت ميّت» — فتبدو الحركة متواصلة وناعمة بلا توقّف بين الدورات.
+        final p = _ctrl.value * 1.3 - 0.65;
         return ShaderMask(
           blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) {
             return LinearGradient(
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
+              // ميل قطري (يبدأ من اليمين علوياً) — كي يعبر الشعاع الشبكة
+              // كلها قطرياً: بطاقات الأعلى تلمع قبل الأسفل.
+              begin: const Alignment(1.0, -0.6),
+              end: const Alignment(-1.0, 0.6),
+              // نطاق لمعان ناعم بخمس محطات: قاعدة → لمعان → قاعدة.
               colors: [
+                sx.shimmerBase,
                 sx.shimmerBase,
                 sx.shimmerHighlight,
                 sx.shimmerBase,
+                sx.shimmerBase,
               ],
-              stops: const [0.25, 0.5, 0.75],
-              transform: _SlideGradientTransform(t * 2 - 1),
+              stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
+              transform: _SlideGradientTransform(p),
             ).createShader(bounds);
           },
           child: child,
@@ -132,6 +139,9 @@ class ListingCardSkeleton extends StatelessWidget {
 }
 
 /// شبكة هياكل تحميل تُستخدم كـ sliver.
+///
+/// الشبكة كلها ملفوفة بلمعان **واحد** كي يعبر الشعاع كامل الشبكة قطرياً
+/// (بدل لمعان مستقل لكل بطاقة).
 class SliverListingGridSkeleton extends StatelessWidget {
   const SliverListingGridSkeleton({super.key, this.count = 6});
 
@@ -139,18 +149,20 @@ class SliverListingGridSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.all(12),
-      sliver: SliverGrid(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 0.72,
-        ),
-        delegate: SliverChildBuilderDelegate(
-          (context, i) => const SxShimmer(child: ListingCardSkeleton()),
-          childCount: count,
+    return SliverToBoxAdapter(
+      child: SxShimmer(
+        child: GridView.builder(
+          padding: const EdgeInsets.all(12),
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.72,
+          ),
+          itemCount: count,
+          itemBuilder: (_, __) => const ListingCardSkeleton(),
         ),
       ),
     );

@@ -52,7 +52,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: glassAppBar(
         title: const Text('المحادثات'),
         actions: [
           if (loggedIn)
@@ -78,8 +79,11 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                     )
                   : RefreshIndicator(
                       onRefresh: _load,
+                      edgeOffset: glassTopInset(context),
                       child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: EdgeInsets.only(
+                            top: glassTopInset(context) + 8,
+                            bottom: glassNavInset(context)),
                         itemCount: _items.length,
                         separatorBuilder: (_, __) => Divider(
                           height: 1,

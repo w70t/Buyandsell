@@ -54,7 +54,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
+      extendBodyBehindAppBar: true,
+      appBar: glassAppBar(
         title: const Text('المفضلة'),
         actions: [
           if (loggedIn)
@@ -74,9 +75,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             )
           : RefreshIndicator(
               onRefresh: _load,
+              edgeOffset: glassTopInset(context),
               child: CustomScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 slivers: [
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: glassTopInset(context)),
+                  ),
                   if (_loading && !_loadedOnce)
                     const SliverListingGridSkeleton(count: 6)
                   else if (_items.isEmpty)
@@ -90,6 +95,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     )
                   else
                     SliverListingGrid(items: _items),
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: glassNavInset(context)),
+                  ),
                 ],
               ),
             ),

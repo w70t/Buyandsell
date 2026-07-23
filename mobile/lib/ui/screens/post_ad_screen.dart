@@ -142,14 +142,15 @@ class _PostAdScreenState extends State<PostAdScreen> {
     final loggedIn = context.watch<AuthProvider>().isLoggedIn;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('أضف إعلانك')),
+      extendBodyBehindAppBar: true,
+      appBar: glassAppBar(title: const Text('أضف إعلانك')),
       body: !loggedIn
           ? LoginRequired(
               message: 'سجّل الدخول لنشر إعلان',
               onLogin: () => openAuth(context),
             )
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(16, glassTopInset(context) + 16, 16, 16),
               children: [
                 _SectionCard(
                   title: 'الصور',
@@ -261,7 +262,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       : const Icon(Icons.rocket_launch_outlined, size: 20),
                   label: Text(_busy ? _busyLabel : 'نشر الإعلان'),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: glassNavInset(context)),
               ],
             ),
     );

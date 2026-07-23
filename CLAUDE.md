@@ -2,10 +2,10 @@
 <One line: what it does, for whom.>
 
 ## Status  (AI must update this at end of every task)
-Working: <features that run>
-In progress: <feature — % + next step>
-Known bugs: <list or "none">
-Last updated: <date>
+Working: Web UI + admin panel now use a modern inline-SVG icon set (app/web/icons.py) instead of emoji; all 34 backend tests pass.
+In progress: none
+Known bugs: none
+Last updated: 2026-07-23
 
 ## Stack
 <e.g., Python 3.11, aiogram 3, FastAPI, SQLite (WAL), vanilla JS admin>

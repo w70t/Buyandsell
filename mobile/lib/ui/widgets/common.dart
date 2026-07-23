@@ -38,6 +38,27 @@ const double kBottomNavBarHeight = 64;
 double glassNavInset(BuildContext context) =>
     kBottomNavBarHeight + MediaQuery.of(context).viewPadding.bottom;
 
+/// حشوة علوية لمحتوى شاشة ذات شريط علوي زجاجي (مع extendBodyBehindAppBar)
+/// كي لا يختبئ أول عنصر خلف الشريط: ارتفاع الشريط + شريط الحالة.
+double glassTopInset(BuildContext context) =>
+    kToolbarHeight + MediaQuery.of(context).viewPadding.top;
+
+/// شريط تطبيق علوي زجاجي موحّد (شفاف + تمويه المحتوى خلفه).
+/// استخدمه مع `Scaffold(extendBodyBehindAppBar: true, …)` وأضِف
+/// [glassTopInset] كحشوة علوية لمحتوى الشاشة.
+AppBar glassAppBar({
+  required Widget title,
+  List<Widget>? actions,
+}) {
+  return AppBar(
+    title: title,
+    actions: actions,
+    backgroundColor: Colors.transparent,
+    surfaceTintColor: Colors.transparent,
+    flexibleSpace: const GlassBar(),
+  );
+}
+
 /// نوع الإشعار — يحدد الأيقونة واللون.
 enum SnackType { success, error, info }
 

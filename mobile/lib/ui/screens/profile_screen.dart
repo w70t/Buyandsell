@@ -20,14 +20,16 @@ class ProfileScreen extends StatelessWidget {
     final user = auth.user;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('حسابي')),
+      extendBodyBehindAppBar: true,
+      appBar: glassAppBar(title: const Text('حسابي')),
       body: user == null
           ? LoginRequired(
               message: 'لم تسجّل الدخول بعد',
               onLogin: () => openAuth(context),
             )
           : ListView(
-              padding: EdgeInsets.fromLTRB(16, 16, 16, glassNavInset(context) + 8),
+              padding: EdgeInsets.fromLTRB(
+                  16, glassTopInset(context) + 8, 16, glassNavInset(context) + 8),
               children: [
                 // بطاقة المستخدم بترويسة متدرجة.
                 Container(

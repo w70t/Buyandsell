@@ -28,7 +28,6 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
-    final sx = context.sx;
     final pages = [
       const HomeScreen(),
       const FavoritesScreen(),
@@ -41,51 +40,122 @@ class _HomeShellState extends State<HomeShell> {
       // يمتدّ الجسم تحت الشريط ليتيح لتأثير الـ blur تصوير المحتوى خلفه.
       extendBody: true,
       body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: Container(
-            decoration: BoxDecoration(
-              // شبه شفاف كي يظهر المحتوى المموّه خلف الشريط (زجاجي).
-              color: sx.surface.withOpacity(0.72),
-              border: Border(top: BorderSide(color: sx.outline.withOpacity(0.6))),
-            ),
-            child: SafeArea(
-              top: false,
-              child: SizedBox(
-                height: kBottomNavBarHeight,
-                child: Row(
-              children: [
-                _NavItem(
-                  icon: Icons.home_outlined,
-                  selectedIcon: Icons.home_rounded,
-                  label: 'الرئيسية',
-                  selected: _index == 0,
-                  onTap: () => _goto(0),
+      bottomNavigationBar: _FloatingGlassNav(index: _index, onTap: _goto),
+    );
+  }
+}
+
+/// شريط تنقّل عائم بيضوي زجاجي (blur) مع مؤشّر ضبابي ينزلق للتبويب المختار —
+/// بأسلوب iOS الحديث.
+class _FloatingGlassNav extends StatelessWidget {
+  const _FloatingGlassNav({required this.index, required this.onTap});
+
+  final int index;
+  final ValueChanged<int> onTap;
+
+  static const _height = kBottomNavBarHeight;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Container(
+          // يحمل الظلّ خارج الاقتصاص كي لا يُقصّ.
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.28),
+                blurRadius: 26,
+                offset: const Offset(0, 12),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(30),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 22, sigmaY: 22),
+              child: Container(
+                height: _height,
+                decoration: BoxDecoration(
+                  color: sx.surface.withOpacity(0.72),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: sx.outline.withOpacity(0.7)),
                 ),
-                _NavItem(
-                  icon: Icons.favorite_border_rounded,
-                  selectedIcon: Icons.favorite_rounded,
-                  label: 'المفضلة',
-                  selected: _index == 1,
-                  onTap: () => _goto(1),
-                ),
-                _SellButton(selected: _index == 2, onTap: () => _goto(2)),
-                _NavItem(
-                  icon: Icons.chat_bubble_outline_rounded,
-                  selectedIcon: Icons.chat_bubble_rounded,
-                  label: 'المحادثات',
-                  selected: _index == 3,
-                  onTap: () => _goto(3),
-                ),
-                _NavItem(
-                  icon: Icons.person_outline_rounded,
-                  selectedIcon: Icons.person_rounded,
-                  label: 'حسابي',
-                  selected: _index == 4,
-                  onTap: () => _goto(4),
-                ),
-                  ],
+                child: LayoutBuilder(
+                  builder: (context, c) {
+                    final slot = c.maxWidth / 5;
+                    const blobH = 46.0;
+                    final blobW = slot - 12;
+                    return Stack(
+                      children: [
+                        // المؤشّر الضبابي المنزلق — يتبع الاتجاه RTL عبر start.
+                        AnimatedPositionedDirectional(
+                          duration: const Duration(milliseconds: 320),
+                          curve: Curves.easeOutCubic,
+                          top: (_height - blobH) / 2,
+                          start: slot * index + (slot - blobW) / 2,
+                          width: blobW,
+                          height: blobH,
+                          child: AnimatedOpacity(
+                            duration: const Duration(milliseconds: 180),
+                            // يختفي تحت زر «بيع» المركزي (فالزر نفسه هو المؤشّر).
+                            opacity: index == 2 ? 0 : 1,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: sx.accent.withOpacity(0.16),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: sx.accent.withOpacity(0.22),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: Row(
+                            children: [
+                              _NavItem(
+                                icon: Icons.home_outlined,
+                                selectedIcon: Icons.home_rounded,
+                                label: 'الرئيسية',
+                                selected: index == 0,
+                                onTap: () => onTap(0),
+                              ),
+                              _NavItem(
+                                icon: Icons.favorite_border_rounded,
+                                selectedIcon: Icons.favorite_rounded,
+                                label: 'المفضلة',
+                                selected: index == 1,
+                                onTap: () => onTap(1),
+                              ),
+                              _SellButton(
+                                selected: index == 2,
+                                onTap: () => onTap(2),
+                              ),
+                              _NavItem(
+                                icon: Icons.chat_bubble_outline_rounded,
+                                selectedIcon: Icons.chat_bubble_rounded,
+                                label: 'المحادثات',
+                                selected: index == 3,
+                                onTap: () => onTap(3),
+                              ),
+                              _NavItem(
+                                icon: Icons.person_outline_rounded,
+                                selectedIcon: Icons.person_rounded,
+                                label: 'حسابي',
+                                selected: index == 4,
+                                onTap: () => onTap(4),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
@@ -116,13 +186,14 @@ class _NavItem extends StatelessWidget {
     final sx = context.sx;
     final color = selected ? sx.accent : sx.textSecondary;
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedSwitcher(
-              duration: const Duration(milliseconds: 180),
+              duration: const Duration(milliseconds: 200),
               transitionBuilder: (child, anim) =>
                   ScaleTransition(scale: anim, child: child),
               child: Icon(
@@ -159,27 +230,26 @@ class _SellButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final sx = context.sx;
     return Expanded(
-      child: InkWell(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
+              duration: const Duration(milliseconds: 200),
               width: 42,
               height: 42,
               decoration: BoxDecoration(
                 gradient: AppTheme.brandGradient,
                 borderRadius: BorderRadius.circular(14),
-                boxShadow: selected
-                    ? [
-                        BoxShadow(
-                          color: sx.accent.withOpacity(0.45),
-                          blurRadius: 14,
-                          offset: const Offset(0, 4),
-                        ),
-                      ]
-                    : null,
+                boxShadow: [
+                  BoxShadow(
+                    color: sx.accent.withOpacity(selected ? 0.5 : 0.32),
+                    blurRadius: selected ? 16 : 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: const Icon(Icons.add_rounded, color: Colors.white, size: 26),
             ),

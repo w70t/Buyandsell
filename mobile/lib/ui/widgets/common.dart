@@ -30,13 +30,14 @@ class GlassBar extends StatelessWidget {
   }
 }
 
-/// ارتفاع الشريط السفلي الزجاجي (بدون المنطقة الآمنة السفلية).
+/// ارتفاع الشريط السفلي العائم (بدون الهوامش والمنطقة الآمنة).
 const double kBottomNavBarHeight = 64;
 
 /// حشوة سفلية تُضاف لمحتوى شاشات التبويبات كي لا يختفي آخره خلف الشريط
-/// الزجاجي — لأن الجسم يمتدّ تحت الشريط (extendBody) ليظهر تأثير الـ blur.
+/// العائم الزجاجي — لأن الجسم يمتدّ تحته (extendBody) ليظهر تأثير الـ blur.
+/// تشمل ارتفاع الشريط + هامشه السفلي العائم + المنطقة الآمنة.
 double glassNavInset(BuildContext context) =>
-    kBottomNavBarHeight + MediaQuery.of(context).viewPadding.bottom;
+    kBottomNavBarHeight + 24 + MediaQuery.of(context).viewPadding.bottom;
 
 /// حشوة علوية لمحتوى شاشة ذات شريط علوي زجاجي (مع extendBodyBehindAppBar)
 /// كي لا يختبئ أول عنصر خلف الشريط: ارتفاع الشريط + شريط الحالة.

@@ -1,6 +1,34 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
+
+/// خلفية زجاجية لشريط التطبيق العلوي — تُمرَّر كـ `flexibleSpace` فيظهر
+/// المحتوى مموّهاً خلف الشريط عند التمرير (تأثير خفيف بلون شبه شفاف + حدّ سفلي).
+class GlassBar extends StatelessWidget {
+  const GlassBar({super.key, this.sigma = 16});
+
+  final double sigma;
+
+  @override
+  Widget build(BuildContext context) {
+    final sx = context.sx;
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+        child: Container(
+          decoration: BoxDecoration(
+            color: sx.surface.withOpacity(0.60),
+            border: Border(
+              bottom: BorderSide(color: sx.outline.withOpacity(0.5)),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// ارتفاع الشريط السفلي الزجاجي (بدون المنطقة الآمنة السفلية).
 const double kBottomNavBarHeight = 64;

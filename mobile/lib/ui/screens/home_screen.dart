@@ -120,6 +120,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 snap: true,
                 toolbarHeight: 58,
                 titleSpacing: 16,
+                // شريط زجاجي: شفاف مع تمويه المحتوى المارّ خلفه عند التمرير.
+                backgroundColor: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                flexibleSpace: const GlassBar(),
                 title: Row(
                   children: [
                     Container(

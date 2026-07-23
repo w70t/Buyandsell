@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/category_icons.dart';
@@ -218,29 +219,34 @@ class _HomeScreenState extends State<HomeScreen> {
           final c = _categories[i];
           final color = categoryColor(c.icon);
           return GestureDetector(
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => CategoryScreen(category: c)),
-            ),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => CategoryScreen(category: c)),
+              );
+            },
             child: SizedBox(
               width: 68,
               child: Column(
                 children: [
-                  Container(
-                    width: 58,
-                    height: 58,
-                    decoration: BoxDecoration(
-                      gradient: categoryGradient(c.icon),
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: color.withOpacity(0.35),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
+                  PressableScale(
+                    child: Container(
+                      width: 58,
+                      height: 58,
+                      decoration: BoxDecoration(
+                        gradient: categoryGradient(c.icon),
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          BoxShadow(
+                            color: color.withOpacity(0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Icon(categoryIcon(c.icon),
+                          color: Colors.white, size: 27),
                     ),
-                    child: Icon(categoryIcon(c.icon),
-                        color: Colors.white, size: 27),
                   ),
                   const SizedBox(height: 6),
                   Text(
@@ -304,7 +310,9 @@ class _SearchBar extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       child: GestureDetector(
         onTap: () => onTap(),
-        child: Container(
+        child: PressableScale(
+          pressedScale: 0.985,
+          child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
           decoration: BoxDecoration(
             color: sx.surfaceHigh,
@@ -332,6 +340,7 @@ class _SearchBar extends StatelessWidget {
                 child: Icon(Icons.tune_rounded, color: sx.accent, size: 16),
               ),
             ],
+          ),
           ),
         ),
       ),

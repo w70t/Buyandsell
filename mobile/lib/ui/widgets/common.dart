@@ -316,6 +316,103 @@ class SxBadge extends StatelessWidget {
   }
 }
 
+/// يصغّر الطفل قليلاً أثناء الضغط دون التقاط الإيماءة — لمسة حديثة تعمل
+/// جنباً إلى جنب مع `InkWell`/`GestureDetector` الداخلي لأنها تعتمد
+/// `Listener` تمريرياً (لا يبتلع النقرات فتبقى الحبكة والانتقال يعملان).
+class PressableScale extends StatefulWidget {
+  const PressableScale({
+    super.key,
+    required this.child,
+    this.pressedScale = 0.97,
+  });
+
+  final Widget child;
+  final double pressedScale;
+
+  @override
+  State<PressableScale> createState() => _PressableScaleState();
+}
+
+class _PressableScaleState extends State<PressableScale> {
+  bool _down = false;
+
+  void _set(bool value) {
+    if (_down != value) setState(() => _down = value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.deferToChild,
+      onPointerDown: (_) => _set(true),
+      onPointerUp: (_) => _set(false),
+      onPointerCancel: (_) => _set(false),
+      child: AnimatedScale(
+        scale: _down ? widget.pressedScale : 1.0,
+        duration: const Duration(milliseconds: 110),
+        curve: Curves.easeOut,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+/// حركة دخول ناعمة (تلاشٍ + انزلاق للأعلى) بتدرّج بسيط حسب ترتيب العنصر —
+/// تمنح الشبكات إحساساً حديثاً عند أول ظهور.
+class EntranceFade extends StatefulWidget {
+  const EntranceFade({
+    super.key,
+    required this.child,
+    this.index = 0,
+    this.duration = const Duration(milliseconds: 360),
+  });
+
+  final Widget child;
+  final int index;
+  final Duration duration;
+
+  @override
+  State<EntranceFade> createState() => _EntranceFadeState();
+}
+
+class _EntranceFadeState extends State<EntranceFade>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl =
+      AnimationController(vsync: this, duration: widget.duration);
+  late final Animation<double> _curved =
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic);
+
+  @override
+  void initState() {
+    super.initState();
+    // تدرّج محدود حتى لا تتأخر العناصر البعيدة في القائمة.
+    final delayMs = widget.index.clamp(0, 8) * 45;
+    Future.delayed(Duration(milliseconds: delayMs), () {
+      if (mounted) _ctrl.forward();
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.06),
+          end: Offset.zero,
+        ).animate(_curved),
+        child: widget.child,
+      ),
+    );
+  }
+}
+
 /// حرف أول من الاسم داخل دائرة بلون مشتق من الاسم — رمز مستخدم.
 class InitialsAvatar extends StatelessWidget {
   const InitialsAvatar({super.key, required this.name, this.radius = 22});

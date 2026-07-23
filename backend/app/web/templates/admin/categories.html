@@ -15,8 +15,8 @@
   <tr><th>#</th><th>slug</th><th>الاسم</th><th>الترتيب</th><th>فعّال</th><th></th></tr>
   {% for c in categories %}
   <tr>
-    <td>{{ c.id }}</td><td>{{ c.slug }}</td><td>{{ category_icons.get(c.icon,'📦') }} {{ c.name_ar }}</td>
-    <td>{{ c.sort_order }}</td><td>{{ '✅' if c.is_active else '⛔' }}</td>
+    <td>{{ c.id }}</td><td>{{ c.slug }}</td><td><span class="cat-cell">{{ category_icon(c.icon, 18) }} {{ c.name_ar }}</span></td>
+    <td>{{ c.sort_order }}</td><td>{% if c.is_active %}<span class="status-tag ok">{{ icon('check-circle', 15) }}</span>{% else %}<span class="status-tag off">{{ icon('x-circle', 15) }}</span>{% endif %}</td>
     <td>
       <form class="inline" action="/admin/categories/{{ c.id }}/toggle" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">

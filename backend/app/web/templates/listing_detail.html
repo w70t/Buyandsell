@@ -5,7 +5,7 @@
 <article class="detail" data-test="listing-detail">
   {% if request.query_params.get('reported') %}<div class="flash ok" data-test="report-ok">تم استلام بلاغك، شكراً لك.</div>{% endif %}
   {% if listing.status == 'hidden' %}<div class="flash warn">هذا الإعلان مخفي — لا يظهر للزوار.</div>{% endif %}
-  {% if listing.status == 'sold' %}<div class="flash ok">تم البيع ✔</div>{% endif %}
+  {% if listing.status == 'sold' %}<div class="flash ok">{{ icon('check-circle', 18) }} تم البيع</div>{% endif %}
   <div class="detail-grid">
     <div class="gallery">
       {% if listing.images %}
@@ -17,14 +17,14 @@
           {% endfor %}
         </div>
         {% endif %}
-      {% else %}<div class="noimg big">{{ category_icons.get(listing.category.icon, '📦') }}</div>{% endif %}
+      {% else %}<div class="noimg big">{{ category_icon(listing.category.icon, 96) }}</div>{% endif %}
     </div>
     <div class="detail-info">
       <h1 data-test="listing-title">{{ listing.title }}</h1>
       <div class="price big" data-test="listing-price">{{ listing.price|price }}{% if listing.negotiable %} <small>قابل للتفاوض</small>{% endif %}</div>
       <div class="meta">
         {{ listing.category.name_ar }} · {{ listing.governorate }}{% if listing.city %} · {{ listing.city }}{% endif %}<br>
-        {{ 'جديد' if listing.condition == 'new' else 'مستعمل' }} · {{ listing.created_at|timeago }} · 👁 {{ listing.views }}
+        {{ 'جديد' if listing.condition == 'new' else 'مستعمل' }} · {{ listing.created_at|timeago }} · <span class="inline-icon">{{ icon('eye', 16) }} {{ listing.views }}</span>
       </div>
       <p class="description" data-test="listing-description">{{ listing.description }}</p>
 
@@ -40,10 +40,10 @@
         </form>
         <form class="inline" action="/favorites/{{ listing.id }}/toggle" method="post">
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-          <button class="btn" data-test="fav-toggle-detail">{{ '❤ إزالة من المفضلة' if listing.id in fav_ids else '🤍 أضف للمفضلة' }}</button>
+          <button class="btn" data-test="fav-toggle-detail">{{ icon('heart', 18, fill='currentColor') ~ ' إزالة من المفضلة' if listing.id in fav_ids else icon('heart', 18) ~ ' أضف للمفضلة' }}</button>
         </form>
         <details class="report-box">
-          <summary data-test="report-open">🚩 إبلاغ عن الإعلان</summary>
+          <summary data-test="report-open">{{ icon('flag', 16) }} إبلاغ عن الإعلان</summary>
           <form action="/report" method="post" data-test="report-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
             <input type="hidden" name="listing_id" value="{{ listing.id }}">

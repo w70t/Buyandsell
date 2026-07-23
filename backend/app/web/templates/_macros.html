@@ -3,7 +3,7 @@
   <a class="card-link" href="/listings/{{ l.id }}">
     <div class="card-img">
       {% if l.images %}<img src="{{ l.images[0].url }}" alt="{{ l.title }}" loading="lazy">
-      {% else %}<div class="noimg">{{ category_icons.get(l.category.icon, '📦') }}</div>{% endif %}
+      {% else %}<div class="noimg">{{ category_icon(l.category.icon, 44) }}</div>{% endif %}
       {% if l.status == 'sold' %}<span class="ribbon">مباع</span>{% endif %}
       {% if l.status == 'hidden' %}<span class="ribbon gray">مخفي</span>{% endif %}
     </div>
@@ -16,7 +16,7 @@
   {% if user %}
   <form class="fav-form" action="/favorites/{{ l.id }}/toggle" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-    <button title="مفضلة" data-test="fav-toggle" class="{{ 'active' if l.id in fav_ids }}">{{ '❤' if l.id in fav_ids else '🤍' }}</button>
+    <button title="مفضلة" aria-label="مفضلة" data-test="fav-toggle" class="{{ 'active' if l.id in fav_ids }}">{{ icon('heart', 18, fill='currentColor') if l.id in fav_ids else icon('heart', 18) }}</button>
   </form>
   {% endif %}
 </article>

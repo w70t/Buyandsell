@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
 import '../navigation.dart';
+import 'common.dart';
 import 'listing_card.dart';
 
 /// شبكة الإعلانات الموحّدة (sliver) المستخدمة في كل الشاشات.
@@ -22,9 +23,13 @@ class SliverListingGrid extends StatelessWidget {
           childAspectRatio: 0.72,
         ),
         delegate: SliverChildBuilderDelegate(
-          (context, i) => ListingCard(
-            listing: items[i],
-            onTap: () => openListing(context, items[i].id),
+          (context, i) => EntranceFade(
+            index: i,
+            child: ListingCard(
+              listing: items[i],
+              heroTag: 'listing-${items[i].id}',
+              onTap: () => openListing(context, items[i].id),
+            ),
           ),
           childCount: items.length,
         ),

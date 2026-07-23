@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/formatters.dart';
@@ -11,10 +12,18 @@ import 'common.dart';
 
 /// بطاقة إعلان: صورة بشارات الحالة، زر مفضلة متحرك، سعر بارز وموقع/وقت.
 class ListingCard extends StatelessWidget {
-  const ListingCard({super.key, required this.listing, required this.onTap});
+  const ListingCard({
+    super.key,
+    required this.listing,
+    required this.onTap,
+    this.heroTag,
+  });
 
   final Listing listing;
   final VoidCallback onTap;
+
+  /// وسم Hero اختياري لصورة الغلاف — يفعّل انتقالاً سلساً نحو التفاصيل.
+  final Object? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -22,13 +31,14 @@ class ListingCard extends StatelessWidget {
     final isFav = context
         .select<FavoritesProvider, bool>((f) => f.contains(listing.id));
 
-    return Material(
-      color: sx.surface,
-      borderRadius: BorderRadius.circular(18),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Ink(
+    return PressableScale(
+      child: Material(
+        color: sx.surface,
+        borderRadius: BorderRadius.circular(18),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Ink(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
             border: Border.all(color: sx.outline),
@@ -40,16 +50,18 @@ class ListingCard extends StatelessWidget {
                 children: [
                   AspectRatio(
                     aspectRatio: 4 / 3,
-                    child: listing.cover != null
-                        ? CachedNetworkImage(
-                            imageUrl: listing.cover!,
-                            fit: BoxFit.cover,
-                            fadeInDuration: const Duration(milliseconds: 250),
-                            placeholder: (_, __) =>
-                                Container(color: sx.shimmerBase),
-                            errorWidget: (_, __, ___) => const _NoImage(),
-                          )
-                        : const _NoImage(),
+                    child: _wrapHero(
+                      listing.cover != null
+                          ? CachedNetworkImage(
+                              imageUrl: listing.cover!,
+                              fit: BoxFit.cover,
+                              fadeInDuration: const Duration(milliseconds: 250),
+                              placeholder: (_, __) =>
+                                  Container(color: sx.shimmerBase),
+                              errorWidget: (_, __, ___) => const _NoImage(),
+                            )
+                          : const _NoImage(),
+                    ),
                   ),
                   // شارة الحالة (جديد) أعلى اليمين.
                   if (listing.condition == 'new')
@@ -156,14 +168,20 @@ class ListingCard extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
+  /// يلفّ صورة الغلاف في Hero عند توفّر وسم — لانتقال سلس نحو التفاصيل.
+  Widget _wrapHero(Widget child) =>
+      heroTag == null ? child : Hero(tag: heroTag!, child: child);
+
   void _toggleFav(BuildContext context) {
+    HapticFeedback.lightImpact();
     final auth = context.read<AuthProvider>();
     if (!auth.isLoggedIn) {
       showAppSnack(context, 'سجّل الدخول لإضافة المفضلة');

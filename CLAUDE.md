@@ -2,9 +2,9 @@
 <One line: what it does, for whom.>
 
 ## Status  (AI must update this at end of every task)
-Working: Web UI + admin panel now use a modern inline-SVG icon set (app/web/icons.py) instead of emoji; all 34 backend tests pass.
+Working: Web UI + admin panel use a modern inline-SVG icon set (app/web/icons.py); all 34 backend tests pass. Flutter app gained modern micro-interactions: haptics (fav/tabs/categories/contact), press-scale (cards/categories/search), staggered grid entrance, and Hero image transition card→detail (new PressableScale/EntranceFade in widgets/common.dart).
 In progress: none
-Known bugs: none
+Known bugs: none — note: Flutter toolchain not available in this env, so changes were verified by static bracket/API review, not `flutter analyze`.
 Last updated: 2026-07-23
 
 ## Stack

@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/formatters.dart';
@@ -65,6 +66,7 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
 
   void _contactSeller() {
     if (!requireLogin(context)) return;
+    HapticFeedback.selectionClick();
     final l = _listing!;
     final me = context.read<AuthProvider>().user!;
     if (me.id == l.seller.id) {
@@ -159,6 +161,7 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
                 color: isFav ? const Color(0xFFFF5A76) : null,
                 onTap: () {
                   if (!requireLogin(context)) return;
+                  HapticFeedback.lightImpact();
                   context.read<FavoritesProvider>().toggle(l.id);
                 },
               ),
@@ -378,15 +381,21 @@ class _ListingDetailScreenState extends State<ListingDetailScreen> {
           controller: _pageCtrl,
           onPageChanged: (i) => setState(() => _page = i),
           itemCount: l.images.length,
-          itemBuilder: (_, i) => GestureDetector(
-            onTap: () => _openViewer(i),
-            child: CachedNetworkImage(
+          itemBuilder: (_, i) {
+            final image = CachedNetworkImage(
               imageUrl: l.images[i].url,
               fit: BoxFit.cover,
               placeholder: (_, __) => Container(color: sx.shimmerBase),
               errorWidget: (_, __, ___) => Container(color: sx.surfaceHigh),
-            ),
-          ),
+            );
+            return GestureDetector(
+              onTap: () => _openViewer(i),
+              // الصورة الأولى تشترك بوسم Hero مع بطاقة الإعلان.
+              child: i == 0
+                  ? Hero(tag: 'listing-${l.id}', child: image)
+                  : image,
+            );
+          },
         ),
         // تظليل سفلي خفيف لوضوح النقاط.
         Positioned(

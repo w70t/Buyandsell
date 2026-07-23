@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
 import 'conversations_screen.dart';
@@ -17,7 +18,10 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
 
-  void _goto(int i) => setState(() => _index = i);
+  void _goto(int i) {
+    if (i != _index) HapticFeedback.selectionClick();
+    setState(() => _index = i);
+  }
 
   @override
   Widget build(BuildContext context) {

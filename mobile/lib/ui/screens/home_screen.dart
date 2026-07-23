@@ -200,6 +200,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   SliverLoadingFooter(visible: _loadingMore),
                 ],
               ],
+              // مساحة سفلية بمقدار الشريط الزجاجي كي لا يختفي آخر الإعلانات خلفه.
+              SliverToBoxAdapter(
+                child: SizedBox(height: glassNavInset(context)),
+              ),
             ],
           ),
         ),

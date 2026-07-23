@@ -79,7 +79,8 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                   : RefreshIndicator(
                       onRefresh: _load,
                       child: ListView.separated(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        padding: EdgeInsets.only(
+                            top: 8, bottom: glassNavInset(context)),
                         itemCount: _items.length,
                         separatorBuilder: (_, __) => Divider(
                           height: 1,

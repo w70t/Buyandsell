@@ -261,7 +261,7 @@ class _PostAdScreenState extends State<PostAdScreen> {
                       : const Icon(Icons.rocket_launch_outlined, size: 20),
                   label: Text(_busy ? _busyLabel : 'نشر الإعلان'),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: glassNavInset(context)),
               ],
             ),
     );

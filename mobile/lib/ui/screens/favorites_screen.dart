@@ -90,6 +90,9 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     )
                   else
                     SliverListingGrid(items: _items),
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: glassNavInset(context)),
+                  ),
                 ],
               ),
             ),

@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme.dart';
 
+/// ارتفاع الشريط السفلي الزجاجي (بدون المنطقة الآمنة السفلية).
+const double kBottomNavBarHeight = 64;
+
+/// حشوة سفلية تُضاف لمحتوى شاشات التبويبات كي لا يختفي آخره خلف الشريط
+/// الزجاجي — لأن الجسم يمتدّ تحت الشريط (extendBody) ليظهر تأثير الـ blur.
+double glassNavInset(BuildContext context) =>
+    kBottomNavBarHeight + MediaQuery.of(context).viewPadding.bottom;
+
 /// نوع الإشعار — يحدد الأيقونة واللون.
 enum SnackType { success, error, info }
 

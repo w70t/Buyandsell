@@ -27,7 +27,7 @@ class ProfileScreen extends StatelessWidget {
               onLogin: () => openAuth(context),
             )
           : ListView(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.fromLTRB(16, 16, 16, glassNavInset(context) + 8),
               children: [
                 // بطاقة المستخدم بترويسة متدرجة.
                 Container(

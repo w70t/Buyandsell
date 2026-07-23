@@ -1,7 +1,10 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../core/theme.dart';
+import '../widgets/common.dart';
 import 'conversations_screen.dart';
 import 'favorites_screen.dart';
 import 'home_screen.dart';
@@ -35,17 +38,23 @@ class _HomeShellState extends State<HomeShell> {
     ];
 
     return Scaffold(
+      // يمتدّ الجسم تحت الشريط ليتيح لتأثير الـ blur تصوير المحتوى خلفه.
+      extendBody: true,
       body: IndexedStack(index: _index, children: pages),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: sx.surface,
-          border: Border(top: BorderSide(color: sx.outline)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
+      bottomNavigationBar: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Container(
+            decoration: BoxDecoration(
+              // شبه شفاف كي يظهر المحتوى المموّه خلف الشريط (زجاجي).
+              color: sx.surface.withOpacity(0.72),
+              border: Border(top: BorderSide(color: sx.outline.withOpacity(0.6))),
+            ),
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                height: kBottomNavBarHeight,
+                child: Row(
               children: [
                 _NavItem(
                   icon: Icons.home_outlined,
@@ -76,7 +85,9 @@ class _HomeShellState extends State<HomeShell> {
                   selected: _index == 4,
                   onTap: () => _goto(4),
                 ),
-              ],
+                  ],
+                ),
+              ),
             ),
           ),
         ),

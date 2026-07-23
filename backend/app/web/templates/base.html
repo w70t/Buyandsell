@@ -10,17 +10,17 @@
 <body>
 <header class="topbar">
   <div class="container topbar-inner">
-    <a class="brand" href="/">🛒 {{ app_name }}</a>
+    <a class="brand" href="/">{{ icon('bag', 24) }} {{ app_name }}</a>
     <form class="nav-search" action="/search" method="get">
       <input type="search" name="q" placeholder="ابحث عن أي شيء…" value="{{ q or '' }}">
       <button type="submit">بحث</button>
     </form>
     <nav class="nav-links">
       {% if user %}
-        <a href="/post" class="btn btn-accent" data-test="nav-post">+ أضف إعلاناً</a>
-        <a href="/notifications" data-test="nav-notifications">🔔{% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
-        <a href="/chat" data-test="nav-chat">💬</a>
-        <a href="/favorites" data-test="nav-favorites">❤</a>
+        <a href="/post" class="btn btn-accent" data-test="nav-post">{{ icon('plus', 18) }} أضف إعلاناً</a>
+        <a class="nav-icon" href="/notifications" title="الإشعارات" aria-label="الإشعارات" data-test="nav-notifications">{{ icon('bell', 22) }}{% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a>
+        <a class="nav-icon" href="/chat" title="المحادثات" aria-label="المحادثات" data-test="nav-chat">{{ icon('chat', 22) }}</a>
+        <a class="nav-icon" href="/favorites" title="المفضلة" aria-label="المفضلة" data-test="nav-favorites">{{ icon('heart', 22) }}</a>
         <a href="/my" data-test="nav-my">إعلاناتي</a>
         {% if user.role == 'admin' %}<a href="/admin" data-test="nav-admin">الإدارة</a>{% endif %}
         <form action="/logout" method="post" class="inline">

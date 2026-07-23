@@ -12,7 +12,7 @@
     <td>{{ u.name }}</td>
     <td dir="ltr">{{ u.phone }}</td>
     <td>{{ 'مدير' if u.role == 'admin' else 'مستخدم' }}</td>
-    <td>{{ '🚫 محظور' if u.is_banned else '✅' }}</td>
+    <td>{% if u.is_banned %}<span class="status-tag banned">{{ icon('ban', 15) }} محظور</span>{% else %}<span class="status-tag ok">{{ icon('check-circle', 15) }} نشط</span>{% endif %}</td>
     <td class="actions">
       {% if u.id != user.id %}
       <form class="inline" action="/admin/users/{{ u.id }}/ban" method="post">

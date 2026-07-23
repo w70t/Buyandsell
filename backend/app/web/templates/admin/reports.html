@@ -17,7 +17,7 @@
     </div>
     <div class="report-target">
       {% if r.listing %}الإعلان: <a href="/listings/{{ r.listing.id }}">{{ r.listing.title }}</a> ({{ r.listing.status }}){% endif %}
-      {% if r.reported_user %} · المستخدم: {{ r.reported_user.name }}{% if r.reported_user.is_banned %} 🚫{% endif %}{% endif %}
+      {% if r.reported_user %} · المستخدم: {{ r.reported_user.name }}{% if r.reported_user.is_banned %} <span class="status-tag banned">{{ icon('ban', 14) }} محظور</span>{% endif %}{% endif %}
     </div>
     {% if r.details %}<p class="report-details">{{ r.details }}</p>{% endif %}
     {% if r.status == 'open' %}

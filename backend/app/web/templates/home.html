@@ -6,7 +6,7 @@
   <div class="cat-grid">
     {% for c in nav_categories %}
     <a class="cat" href="/search?category_id={{ c.id }}" data-test="category-tile">
-      <span class="cat-icon">{{ category_icons.get(c.icon, '📦') }}</span>
+      <span class="cat-icon">{{ category_icon(c.icon) }}</span>
       <span class="cat-name">{{ c.name_ar }}</span>
     </a>
     {% endfor %}

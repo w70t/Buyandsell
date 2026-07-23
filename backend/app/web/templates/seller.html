@@ -5,7 +5,7 @@
 <h1>إعلانات {{ seller.name }}</h1>
 {% if user and user.id != seller.id %}
 <details class="report-box">
-  <summary>🚩 إبلاغ عن هذا المستخدم</summary>
+  <summary>{{ icon('flag', 16) }} إبلاغ عن هذا المستخدم</summary>
   <form action="/report" method="post">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="reported_user_id" value="{{ seller.id }}">

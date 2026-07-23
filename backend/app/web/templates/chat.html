@@ -7,7 +7,7 @@
     {% for m in messages %}
     <div class="msg {{ 'mine' if m.sender_id == user.id else 'theirs' }}" data-test="chat-message">
       <div class="msg-body">{{ m.body }}</div>
-      <div class="msg-meta">{{ m.created_at|timeago }}{% if m.sender_id == user.id %} {{ '✓✓' if m.is_read else '✓' }}{% endif %}</div>
+      <div class="msg-meta">{{ m.created_at|timeago }}{% if m.sender_id == user.id %} <span class="tick {{ 'read' if m.is_read }}">{{ icon('check-check', 15) if m.is_read else icon('check', 15) }}</span>{% endif %}</div>
     </div>
     {% endfor %}
   </div>

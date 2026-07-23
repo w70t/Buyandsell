@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models import Category, Notification, User
 from app.web.deps import ensure_csrf
+from app.web.icons import CATEGORY_ICONS, category_icon, icon
 
 TEMPLATES_DIR = Path(__file__).parent / "templates"
 STATIC_DIR = Path(__file__).parent / "static"
@@ -29,14 +30,6 @@ REPORT_REASONS = [
     ("spam", "إعلان مكرر / مزعج"),
     ("other", "سبب آخر"),
 ]
-
-CATEGORY_ICONS = {
-    "grid": "▦", "home": "🏠", "car": "🚗", "phone": "📱", "bolt": "⚡",
-    "chair": "🪑", "shirt": "👕", "work": "💼", "stroller": "🧸",
-    "pets": "🐾", "tools": "🛠", "sports": "⚽", "book": "📚",
-    "gift": "🎁", "widgets": "📦",
-}
-
 
 def fmt_price(value: int | None) -> str:
     if not value:
@@ -73,6 +66,8 @@ templates.env.filters["timeago"] = timeago
 templates.env.globals["governorates"] = GOVERNORATES
 templates.env.globals["report_reasons"] = REPORT_REASONS
 templates.env.globals["category_icons"] = CATEGORY_ICONS
+templates.env.globals["icon"] = icon
+templates.env.globals["category_icon"] = category_icon
 templates.env.globals["app_name"] = settings.app_name
 
 

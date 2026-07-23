@@ -16,7 +16,7 @@ class _SxShimmerState extends State<SxShimmer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 1400),
+    duration: const Duration(milliseconds: 1500),
   )..repeat();
 
   @override
@@ -32,20 +32,26 @@ class _SxShimmerState extends State<SxShimmer>
       animation: _ctrl,
       child: widget.child,
       builder: (context, child) {
-        final t = _ctrl.value;
+        // مدى الحركة مضبوط بحيث يدخل اللمعان من حافة ويخرج من الأخرى دون
+        // «وقت ميّت» — فتبدو الحركة متواصلة وناعمة بلا توقّف بين الدورات.
+        final p = _ctrl.value * 1.3 - 0.65;
         return ShaderMask(
           blendMode: BlendMode.srcATop,
           shaderCallback: (bounds) {
             return LinearGradient(
-              begin: Alignment.centerRight,
-              end: Alignment.centerLeft,
+              // ميل قطري خفيف (يبدأ من اليمين علوياً) — أكثر حداثة من الأفقي.
+              begin: const Alignment(1.0, -0.35),
+              end: const Alignment(-1.0, 0.35),
+              // نطاق لمعان ناعم بخمس محطات: قاعدة → لمعان → قاعدة.
               colors: [
+                sx.shimmerBase,
                 sx.shimmerBase,
                 sx.shimmerHighlight,
                 sx.shimmerBase,
+                sx.shimmerBase,
               ],
-              stops: const [0.25, 0.5, 0.75],
-              transform: _SlideGradientTransform(t * 2 - 1),
+              stops: const [0.0, 0.35, 0.5, 0.65, 1.0],
+              transform: _SlideGradientTransform(p),
             ).createShader(bounds);
           },
           child: child,
